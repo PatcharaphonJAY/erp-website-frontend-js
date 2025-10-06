@@ -44,7 +44,7 @@ const Navbar = () => {
               height={30} 
               className="rounded-full"
             />
-            <span>ERP SOLUTION</span>
+            <span>ERP-website</span>
           </button>
 
           {/* Navigation Links (Desktop) */}
