@@ -1,28 +1,27 @@
-// src/app/page.js
-
-// Import Component ต่างๆ ที่เราสร้างไว้ใน src/components
-// ใช้ @/components/ เพื่ออ้างอิงถึง src/components ตามการตั้งค่า default ของ Next.js
+// src/app/page.js (ส่วนที่แก้ไข)
+"use client"; // ต้องเป็น Client Component เพื่อใช้ Context
 import HeroSection from '@/components/HeroSection';
 import KeyFeatures from '@/components/KeyFeatures';
 import ModulesOverview from '@/components/ModulesOverview';
-
-// หมายเหตุ: ในโค้ดนี้ สมมติว่าคุณมี Component ชื่อ HeroSection แล้ว
-// ถ้ายังไม่มี ต้องสร้างไฟล์ HeroSection.jsx ก่อน
+import { useHero } from './HeroContext'; // 1. Import Hook
 
 export default function Home() {
+  const { isHeroVisible } = useHero(); // 2. ดึง isHeroVisible มาใช้
+  
   return (
     <main>
-      {/* 1. ส่วนหัว: แนะนำระบบและ Call-to-Action */}
-      <HeroSection /> 
+      {/* 3. ใช้ Conditional Rendering และ Transition */}
+      <div 
+        className={`overflow-hidden transition-all duration-500 ease-in-out ${
+          isHeroVisible ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <HeroSection /> 
+      </div>
       
-      {/* 2. ส่วนแสดงจุดเด่นและประโยชน์หลักของระบบ */}
+      {/* ส่วนอื่นๆ ของหน้า */}
       <KeyFeatures />
-      
-      {/* 3. ส่วนแสดงภาพรวมของโมดูลทั้งหมด */}
       <ModulesOverview />
-      
-      {/* 4. ส่วนอื่นๆ ที่จะเพิ่มเข้ามาในภายหลัง (เช่น Testimonials, CTA พิเศษ) */}
-      {/* <TestimonialsSection /> */}
     </main>
   );
 }
