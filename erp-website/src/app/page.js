@@ -1,22 +1,89 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-// สมมติว่า Navbar component ถูกสร้างไว้แล้วใน path นี้
-import Navbar from '../components/Navbar'; 
+import Navbar from '../components/Navbar';
+
+// Custom SVG Icons Component
+const Icons = {
+  CreditCard: ({ size = 24, strokeWidth = 2, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+      <line x1="1" y1="10" x2="23" y2="10"/>
+    </svg>
+  ),
+  Users: ({ size = 24, strokeWidth = 2, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+  ),
+  Package: ({ size = 24, strokeWidth = 2, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M16.5 9.4l-9-5.19"/>
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+      <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+      <line x1="12" y1="22.08" x2="12" y2="12"/>
+    </svg>
+  ),
+  ShieldCheck: ({ size = 24, strokeWidth = 2, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      <polyline points="9 12 11 14 15 10"/>
+    </svg>
+  ),
+  FileText: ({ size = 24, strokeWidth = 2, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/>
+      <line x1="16" y1="17" x2="8" y2="17"/>
+      <polyline points="10 9 9 9 8 9"/>
+    </svg>
+  ),
+  ShoppingCart: ({ size = 24, strokeWidth = 2, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <circle cx="9" cy="21" r="1"/>
+      <circle cx="20" cy="21" r="1"/>
+      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+    </svg>
+  ),
+  Settings: ({ size = 24, strokeWidth = 2, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m-2.8 2.8l-4.2 4.2m10.4 0l-4.2-4.2M7.8 7.8L3.6 3.6"/>
+      <path d="M20.66 12A8.66 8.66 0 0 1 12 20.66 8.66 8.66 0 0 1 3.34 12 8.66 8.66 0 0 1 12 3.34 8.66 8.66 0 0 1 20.66 12z"/>
+    </svg>
+  ),
+  Megaphone: ({ size = 24, strokeWidth = 2, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="m3 11 18-5v12L3 14v-3z"/>
+      <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>
+    </svg>
+  ),
+  BarChart3: ({ size = 24, strokeWidth = 2, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M3 3v18h18"/>
+      <path d="M18 17V9"/>
+      <path d="M13 17V5"/>
+      <path d="M8 17v-3"/>
+    </svg>
+  ),
+};
 
 export default function Home() {
   const [stars, setStars] = useState([]);
+  const [moduleView, setModuleView] = useState('grid');
   
-  // *** การตั้งค่าสีและข้อมูล (Variables ถูกย้ายมาที่นี่) ***
-  const ACCENT_COLOR_CLASS = 'text-gray-900'; 
-  const ACCENT_COLOR_TITLE = 'text-sky-600'; 
-  const BUTTON_BG_CLASS = 'bg-sky-600';
+  const HERO_IMAGES = [
+    "https://levinci.group/wp-content/uploads/2024/04/why-should-business-use-ERP-1024x611.jpg",
+    "https://tigersoft.co.th/wp-content/uploads/2023/08/blog21.jpg",
+    "https://mayade.co.th/wp-content/uploads/2022/06/SeekPng.com_dmk-logo-png_8986300.png"
+  ];
   
-  const GRADIENT_FROM = 'rgba(14, 165, 233, 0.2)'; 
-  const GRADIENT_TO = 'rgba(2, 132, 199, 0.0)'; 
-
-  const SYSTEM_LOGO_URL = "https://via.placeholder.com/200x200?text=KNOWLEDGE+HUB"; 
-  const INTERCONNECTION_DIAGRAM_URL = "https://via.placeholder.co/400x550?text=System+Interconnection+Diagram";
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   const PHR_DAN_SAI_PERSONNEL = [
     { name: "นายแพทย์สมศักดิ์ รักษาดี", position: "ผู้อำนวยการโรงพยาบาล", iconInitial: "MD", description: "บริหารวิสัยทัศน์กว้างไกล นำพาองค์กรสู่การพัฒนาด้านสาธารณสุขอย่างยั่งยืน" },
@@ -25,47 +92,78 @@ export default function Home() {
     { name: "เจ้าหน้าที่สมชาย พัฒนาการ", position: "หัวหน้าฝ่ายไอที", iconInitial: "IT", description: "ดูแลระบบ MIS 4.0 และการเชื่อมต่อ HOSxP ให้ทำงานได้อย่างราบรื่น 24 ชั่วโมง" },
   ];
 
-  // *** Modules Data: ใช้ Outline-like Emojis ที่ Clean และเป็นสากล ***
-  const MIS_MODULES = [
-    // แถวที่ 1
-    { title: 'การเงิน & บัญชี (FIN)', desc: 'บริหารงบประมาณ การเบิกจ่าย และระบบสินไหมอัตโนมัติ', iconChar: '💳' }, // Credit Card (Finance/Billing)
-    { title: 'ทรัพยากรบุคคล (HRM)', desc: 'บริหารจัดการข้อมูลบุคลากร เงินเดือน และการบริหารเวร', iconChar: '👤' }, // Single User (User Management)
-    { title: 'คลังเวชภัณฑ์ (INV)', desc: 'ควบคุมสต็อกคลังเวชภัณฑ์ การรับเข้า-เบิกออก', iconChar: '📦' }, // Package/Box (Inventory)
-    
-    // แถวที่ 2
-    { title: 'บริหารคุณภาพ (QM) & RM', desc: 'บริหารความเสี่ยง และติดตามตัวชี้วัดคุณภาพบริการ', iconChar: '🗊' }, // Outline Check Mark Box (Quality/Form)
-    { title: 'เวชระเบียน (HIS/EHR)', desc: 'เชื่อมต่อ HOSxP และจัดการเอกสารผู้ป่วยดิจิทัล', iconChar: '📃' }, // Page/Document Outline
-    { title: 'การจัดซื้อจัดจ้าง (PROC)', desc: 'วางแผนจัดซื้อ ติดตามการเบิกจ่าย และควบคุมต้นทุน', iconChar: '🛒' }, // Shopping Cart (Procurement)
-    
-    // แถวที่ 3
-    { title: 'ระบบบำรุงรักษา (PM)', desc: 'วางแผนและติดตามการบำรุงรักษาอุปกรณ์และเครื่องมือแพทย์', iconChar: '⚙️' }, // Gear/Settings (Maintenance)
-    { title: 'การตลาด & ประชาสัมพันธ์', desc: 'บริหารจัดการแคมเปญส่งเสริมสุขภาพและการสื่อสารองค์กร', iconChar: '🗣️' }, // Speaking Head (Communication)
-    { title: 'รายงานเชิงวิเคราะห์ (BI)', desc: 'ประมวลผลข้อมูลเพื่อแสดง Dashboard และสนับสนุนการตัดสินใจ', iconChar: '📊' }, // Bar Chart (Analysis/BI)
+  const ERP_ARTICLES = [
+    {
+      title: "5 กลยุทธ์เลือก ERP ให้เหมาะกับธุรกิจโรงพยาบาล",
+      category: "ERP Strategy",
+      date: "15 ต.ค. 2568",
+      imageUrl: "https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_1000,h_646/https://onestopitservices.konicaminolta.co.th/wp-content/uploads/2023/06/%E0%B8%A3%E0%B8%B1%E0%B8%9A%E0%B8%A7%E0%B8%B2%E0%B8%87%E0%B8%A3%E0%B8%B0%E0%B8%9A%E0%B8%9A-ERP-%E0%B8%AA%E0%B8%B3%E0%B8%AB%E0%B8%A3%E0%B8%B1%E0%B8%9A%E0%B8%98%E0%B8%B8%E0%B8%A3%E0%B8%81%E0%B8%B4%E0%B8%88.jpg"
+    },
+    {
+      title: "Case Study: รพร.ด่านซ้าย ลดต้นทุนคลังเวชภัณฑ์ด้วย ERP",
+      category: "Case Study",
+      date: "10 ต.ค. 2568",
+      imageUrl: "https://greenmoons.co.th/wp-content/uploads/2024/08/erp-1-scaled.jpg"
+    },
+    {
+      title: "การเชื่อมต่อระบบ ERP กับ HOSxP เพื่อข้อมูลแบบไร้รอยต่อ",
+      category: "Integration",
+      date: "5 ต.ค. 2568",
+      imageUrl: "https://hosxp.net/wordpress/wp-content/uploads/2023/05/diagram-pacs110664.png"
+    },
+    {
+      title: "ความปลอดภัยของข้อมูล (PDPA) ในระบบ ERP สำหรับโรงพยาบาล",
+      category: "Security",
+      date: "1 ต.ค. 2568",
+      imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR046PbhkzVlnjZqKVjn-XtOjNdwSiaPREiUw&s"
+    },
   ];
 
-  // Hook สำหรับการจัดการ Scroll Reveal
+  const MIS_MODULES = [
+    { title: 'การเงิน & บัญชี (FIN)', desc: 'บริหารงบประมาณ การเบิกจ่าย และระบบสินไหมอัตโนมัติ', Icon: Icons.CreditCard },
+    { title: 'ทรัพยากรบุคคล (HRM)', desc: 'บริหารจัดการข้อมูลบุคลากร เงินเดือน และการบริหารเวร', Icon: Icons.Users },
+    { title: 'คลังเวชภัณฑ์ (INV)', desc: 'ควบคุมสต็อกคลังเวชภัณฑ์ การรับเข้า-เบิกออก', Icon: Icons.Package },
+    { title: 'บริหารคุณภาพ (QM & RM)', desc: 'บริหารความเสี่ยง และติดตามตัวชี้วัดคุณภาพบริการ', Icon: Icons.ShieldCheck },
+    { title: 'เวชระเบียน (HIS/EHR)', desc: 'เชื่อมต่อ HOSxP และจัดการเอกสารผู้ป่วยดิจิทัล', Icon: Icons.FileText },
+    { title: 'การจัดซื้อจัดจ้าง (PROC)', desc: 'วางแผนจัดซื้อ ติดตามการเบิกจ่าย และควบคุมต้นทุน', Icon: Icons.ShoppingCart },
+    { title: 'ระบบซ่อมบำรุง (PM)', desc: 'วางแผนและติดตามการบำรุงรักษาอุปกรณ์และเครื่องมือแพทย์', Icon: Icons.Settings },
+    { title: 'การตลาด & สื่อสารองค์กร', desc: 'บริหารจัดการแคมเปญส่งเสริมสุขภาพและการสื่อสารองค์กร', Icon: Icons.Megaphone },
+    { title: 'รายงานเชิงวิเคราะห์ (BI)', desc: 'ประมวลผลข้อมูลเพื่อแสดง Dashboard และสนับสนุนการตัดสินใจ', Icon: Icons.BarChart3 },
+  ];
+
+  const ANNOUNCEMENTS = [
+    {
+      category: "อัปเดตระบบ",
+      title: "ปรับปรุงระบบ ERP เป็นเวอร์ชั่น 2.1 เพิ่มประสิทธิภาพและความเร็ว",
+      date: "15 ต.ค. 2568",
+      description: "ทีมพัฒนาได้ทำการอัปเดตระบบ ERP ครั้งใหญ่ เพิ่มความเร็วในการประมวลผลรายงานและปรับปรุงหน้าตาของโมดูล HRM ให้ใช้งานง่ายขึ้น"
+    },
+    {
+      category: "ประกาศอบรม",
+      title: "อบรมการใช้งาน Dashboard ใหม่ในโมดูล BI สำหรับหัวหน้าแผนก",
+      date: "12 ต.ค. 2568",
+      description: "ขอเชิญหัวหน้าแผนกทุกท่านเข้าร่วมอบรมการใช้งานระบบรายงานเชิงวิเคราะห์ (BI) ตัวใหม่ ในวันที่ 25 ต.ค. 2568 เวลา 13:00 น. ณ ห้องประชุม IT"
+    },
+    {
+      category: "ซ่อมบำรุง",
+      title: "แจ้งปิดปรับปรุงระบบ Server ประจำเดือน ตุลาคม 2568",
+      date: "10 ต.ค. 2568",
+      description: "ทีม IT จะทำการปิดปรับปรุง Server ในคืนวันเสาร์ที่ 18 ต.ค. 2568 เวลา 00:00 - 03:00 น. ซึ่งจะส่งผลให้ไม่สามารถใช้งานระบบได้ชั่วคราว"
+    }
+  ];
+
+  useEffect(() => {
+    if (!isHovered) {
+      const interval = setInterval(() => {
+        setCurrentImageIndex(prevIndex => (prevIndex + 1) % HERO_IMAGES.length);
+      }, 4000);
+      return () => clearInterval(interval);
+    }
+  }, [isHovered, HERO_IMAGES.length]);
+
   useEffect(() => {
     document.documentElement.style.scrollBehavior = 'smooth';
-
-    // 1. Logic for Scroll Reveal (Intersection Observer)
-    const observer = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          // *** แก้ไข: หยุดสังเกตทันทีที่ปรากฏ (เพื่อให้ Icon คงสถานะแสดงผล) ***
-          observer.unobserve(entry.target); 
-        } 
-      });
-    }, {
-      rootMargin: '0px',
-      threshold: 0.2 // เมื่อ 20% ขององค์ประกอบปรากฏ
-    });
-
-    const moduleCards = document.querySelectorAll('.module-card');
-    moduleCards.forEach(card => observer.observe(card));
-
-    // 2. Star Animation Setup (เดิม)
-    const generatedStars = [...Array(60)].map(() => ({
+    const generatedStars = [...Array(80)].map(() => ({
       left: Math.random() * 100,
       size: Math.random() * 2 + 1,
       delay: Math.random() * 10,
@@ -73,207 +171,328 @@ export default function Home() {
       opacity: Math.random() * 0.5 + 0.3,
     }));
     setStars(generatedStars);
-    
-    // Cleanup function
-    return () => moduleCards.forEach(card => observer.unobserve(card));
   }, []);
 
-  // การประกาศ Class Name ที่ใช้ซ้ำ (ตอนนี้ตัวแปรทั้งหมดถูกประกาศด้านบนแล้ว)
-  const primaryButtonClass = BUTTON_BG_CLASS + ' text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-sky-700 transition transform hover:scale-105';
-  const secondaryButtonClass = 'border-2 border-gray-400 text-gray-200 py-3 px-8 rounded-full hover:border-sky-500 hover:text-sky-500 transition';
-  const inputClass = 'w-full border border-gray-700 p-3 rounded-xl bg-gray-800 text-white placeholder-gray-500 focus:ring-2 focus:ring-sky-500 focus:border-transparent'; 
-  
-  // Modules Class: เพิ่มคลาส 'module-card'
-  const moduleCardClassNew = 'module-card group p-5 bg-[#152033] rounded-3xl shadow-md transition-all duration-300 ease-in-out transform hover:scale-[1.02] relative border border-transparent hover:border-transparent module-card-effect overflow-hidden'; 
-  
-  // Icon Wrapper Class
-  const moduleIconWrapperClass = 'text-2xl mr-3 p-2 bg-gray-700/50 rounded-lg inline-flex items-center justify-center transition-all duration-300 group-hover:bg-sky-600 group-hover:text-white';
-  
-  // Accent Bar Class (แถบสีด้านบน)
-  const accentBarClass = 'absolute top-0 left-0 w-full h-1.5 bg-sky-500/80 rounded-t-3xl transition-all duration-500 group-hover:h-2 group-hover:bg-sky-400';
-
-  // Class สำหรับ Personnel Section (Light Theme)
-  const personnelRowClassCompact = 'group relative flex items-center p-2 bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border-l-4 border-l-sky-600 hover:border-l-sky-800';
-  const hoverOverlayClassPersonnel = 'absolute inset-0 bg-gradient-hover opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0';
-  const profileIconClassCompact = 'w-8 h-8 rounded-full flex-shrink-0 mr-2 z-10 font-medium text-xs flex items-center justify-center bg-gray-100 text-sky-600 border border-sky-300';
-
-
   return (
-    <div className="min-h-screen bg-gray-950 relative overflow-hidden text-white">
-      <Navbar />
+    <div className="min-h-screen bg-gradient-to-b from-[#1e3a5f] to-[#1a2332] text-slate-200 relative overflow-hidden">
+      <Navbar modules={MIS_MODULES} />
 
-      <main>
-        {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-blue-950 to-gray-950 pt-36 pb-48"> 
-          {/* Star animation code remains here */}
-          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-            {stars.map((star, i) => (
-              <span
-                key={i}
-                className="absolute rounded-full bg-white animate-floatStars"
-                style={{
-                  left: `${star.left}%`,
-                  width: `${star.size}px`,
-                  height: `${star.size}px`,
-                  opacity: star.opacity,
-                  animationDelay: `-${star.delay}s`,
-                  animationDuration: `${star.duration}s`,
-                }}
-              ></span>
-            ))}
-          </div>
+      <main className="relative z-10">
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          {stars.map((star, i) => (
+            <span
+              key={i}
+              className="absolute rounded-full bg-white animate-floatStars"
+              style={{
+                left: `${star.left}%`,
+                width: `${star.size}px`,
+                height: `${star.size}px`,
+                opacity: star.opacity,
+                animationDelay: `-${star.delay}s`,
+                animationDuration: `${star.duration}s`,
+              }}
+            ></span>
+          ))}
+        </div>
 
-          <div className="container mx-auto px-4 max-w-7xl relative z-10 grid md:grid-cols-2 gap-12 items-center">
-            <div className="text-white space-y-6 md:text-left text-center">
-              <h1 className="text-4xl font-extrabold leading-tight tracking-tight md:text-5xl">
-                ปลดล็อกศักยภาพธุรกิจ <br />
-                <span className={ACCENT_COLOR_CLASS.replace('text-gray-900', 'text-sky-400')}>ด้วยการวิเคราะห์และวางแผนระบบ ERP</span>
-              </h1>
-              <p className="text-lg md:text-xl text-gray-300">
-                เจาะลึกกลยุทธ์และแนวทางปฏิบัติในการนำ ERP Platform มาเชื่อมต่อทุกฟังก์ชันตั้งแต่ 
-                การเงิน, บุคคลากร, จนถึง คลังสินค้า เพื่อการตัดสินใจทางธุรกิจที่แม่นยำ
-              </p>
-              <div className="flex gap-4 pt-4 flex-wrap md:justify-start justify-center">
-                <a href="#signup" className={primaryButtonClass}>เริ่มอ่านบทวิเคราะห์ &rarr;</a>
-                <a href="#modules" className={secondaryButtonClass}>ดูหัวข้อหลัก</a>
+        <section className="pt-32 lg:pt-36 pb-16">
+          <div className="container mx-auto px-4 max-w-7xl">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+              <div className="text-center lg:text-left">
+                <h1 className="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight text-white">
+                  ERP จากใจ...สู่การใช้งานจริง<br />
+                  <span className="text-blue-400">โดยทีมพัฒนาระบบ รพร.ด่านซ้าย</span>
+                </h1>
+                <p className="mt-6 text-lg md:text-xl text-slate-300 max-w-xl mx-auto lg:mx-0">
+                  ระบบบริหารจัดการที่พัฒนาจากความเข้าใจในทุกขั้นตอนการทำงาน เพื่อเชื่อมต่อทุกหน่วยงานของโรงพยาบาล ตั้งแต่การเงิน, บุคลากร, คลังเวชภัณฑ์ สู่การดูแลผู้ป่วยที่เป็นเลิศ
+                </p>
+                <div className="mt-8 flex gap-4 flex-wrap justify-center lg:justify-start">
+                  <a href="#blog" className="bg-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-blue-700 transition transform hover:scale-105">
+                    อ่าน Case Study &rarr;
+                  </a>
+                  <a href="#modules" className="border-2 border-blue-500 text-blue-300 py-3 px-8 rounded-full hover:bg-blue-500 hover:text-white transition">
+                    ดูองค์ประกอบระบบ
+                  </a>
+                </div>
+              </div>
+
+              <div 
+                className="relative flex justify-center lg:justify-end group"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                <div className="relative w-[320px] h-[320px] md:w-[400px] md:h-[400px]">
+                  <div className="absolute -top-4 -left-4 w-full h-full bg-blue-500/10 rounded-3xl transform rotate-[-6deg] transition-transform duration-500 group-hover:rotate-[-8deg] group-hover:scale-105"></div>
+                  <div className="absolute -bottom-4 -right-4 w-full h-full bg-blue-500/10 rounded-3xl transform rotate-[4deg] transition-transform duration-500 group-hover:rotate-[6deg] group-hover:scale-105"></div>
+                  <div className="relative w-full h-full bg-white/5 backdrop-blur-md rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
+                    {HERO_IMAGES.map((imageUrl, index) => (
+                      <img
+                        key={imageUrl}
+                        src={imageUrl}
+                        alt={`ERP Solution Illustration ${index + 1}`}
+                        className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-in-out transform
+                          ${index === currentImageIndex ? 'opacity-100 z-20' : 'opacity-0 z-10'}
+                          group-hover:scale-105
+                        `}
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="flex justify-center md:justify-end mt-10 md:mt-0">
-                <div className="w-full max-w-sm p-6 bg-white bg-opacity-10 backdrop-blur-sm rounded-full flex items-center justify-center border border-sky-500/50"
-                  style={{ width: '280px', height: '280px' }}>
-                    <img 
-                        src={SYSTEM_LOGO_URL} 
-                        alt="Knowledge Hub Logo" 
-                        className="max-w-[80%] max-h-[80%] object-contain" 
-                        style={{ filter: 'drop-shadow(0 0 10px rgba(14, 165, 233, 0.5))' }}
-                    />
+            <div id="modules" className="mt-24">
+              <div className="flex justify-between items-center mb-8">
+                <h3 className="text-2xl font-bold text-white tracking-wide">
+                  องค์ประกอบหลักของระบบ
+                </h3>
+                <div className="flex items-center gap-2 rounded-lg p-1 bg-white/10">
+                  <button onClick={() => setModuleView('scroll')} className={`px-3 py-1 rounded-md text-sm transition-colors ${moduleView === 'scroll' ? 'bg-blue-600 text-white shadow' : 'text-slate-300 hover:bg-white/10'}`}>
+                    เลื่อน
+                  </button>
+                  <button onClick={() => setModuleView('grid')} className={`px-3 py-1 rounded-md text-sm transition-colors ${moduleView === 'grid' ? 'bg-blue-600 text-white shadow' : 'text-slate-300 hover:bg-white/10'}`}>
+                    ตาราง
+                  </button>
                 </div>
-            </div>
-          </div>
-        </section>
+              </div>
+              <p className="text-center text-slate-300 mb-10 -mt-4">
+                9 เครื่องมือสำคัญที่เชื่อมต่อการทำงานของโรงพยาบาลให้เป็นหนึ่งเดียว
+              </p>
 
-        {/* Modules Section (Dark Theme - 9 Core Modules, Lineal Style with Scroll Reveal) */}
-        <section id="modules" className="py-32 bg-gray-950 text-white">
-          <div className="container mx-auto px-4 max-w-7xl">
-            {/* หัวข้อ */}
-            <h2 className="text-4xl font-extrabold text-center mb-16 text-gray-100">
-                โครงสร้าง 9 องค์ประกอบหลักของระบบบริหารสารสนเทศ (MIS)
-            </h2>
-            {/* ปรับ Grid เป็น 3 คอลัมน์สำหรับ 9 Modules */}
-            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {MIS_MODULES.map((m, i) => (
-                <div 
-                    key={i} 
-                    className={moduleCardClassNew}
-                    // กำหนด Custom Data Attribute สำหรับใช้กับ CSS Animation Delay
-                    data-delay={i} 
-                >
-                    {/* *** Accent Bar ด้านบน *** */}
-                    <div className={accentBarClass}></div>
-                    
-                    {/* จัดวาง Icon และ Title ให้อยู่บรรทัดเดียวกัน */}
-                    <div className="flex items-center mb-2 mt-2"> 
-                        <div className={moduleIconWrapperClass}>
-                            {/* Icon Element */}
-                            <span className="icon-pure-outline-style">{m.iconChar}</span>
+              {moduleView === 'scroll' ? (
+                <div className="scroll-container">
+                  <div className="scroll-content scroll-right-to-left">
+                    {[...MIS_MODULES, ...MIS_MODULES].map((m, i) => (
+                      <div
+                        key={`scroll-${i}`}
+                        className="scroll-item group p-4 rounded-xl shadow-lg transition-all duration-300 bg-white/5 backdrop-blur-sm border border-blue-500/20 hover:border-blue-400 flex-shrink-0"
+                        style={{ width: '220px' }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="text-blue-400 p-2 bg-blue-500/10 rounded-lg transition-all duration-500 group-hover:bg-blue-500 group-hover:text-white">
+                            <m.Icon size={28} strokeWidth={2} />
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors duration-300">
+                              {m.title}
+                            </h4>
+                          </div>
                         </div>
-                        <h3 className={`text-lg font-bold text-sky-400`}>{m.title}</h3>
-                    </div>
-                    {/* คำอธิบายที่กระชับยิ่งขึ้น */}
-                    <p className="text-gray-400 text-sm">{m.desc}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ))}
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-4">
+                  {MIS_MODULES.map((m, i) => (
+                    <div
+                      key={`grid-${i}`}
+                      className="group p-4 rounded-xl shadow-lg transition-all duration-300 bg-white/5 backdrop-blur-sm border border-blue-500/20 hover:border-blue-400 text-center"
+                    >
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="text-blue-400 p-3 bg-blue-500/10 rounded-lg transition-all duration-500 group-hover:bg-blue-500 group-hover:text-white">
+                          <m.Icon size={32} strokeWidth={2} />
+                        </div>
+                        <div>
+                          <h4 className="text-base font-bold text-white group-hover:text-blue-300 transition-colors duration-300">
+                            {m.title}
+                          </h4>
+                          <p className="text-xs text-slate-400 mt-1">{m.desc}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </section>
 
-        {/* Personnel Section (Light Theme - Compact & Accent Bar) */}
-        <section className={`relative py-24 bg-white text-gray-900 shadow-inner-custom`}>
-            {/* Seamless Transition Effect */}
-            <div className="absolute top-0 left-0 w-full h-24 -mt-24 bg-gradient-to-b from-transparent to-white pointer-events-none" />
-
-            <div className="container mx-auto px-4 max-w-7xl">
-                {/* หัวข้อ */}
-                <h2 className="text-4xl font-extrabold text-center mb-16 text-gray-900">
-                    <span className='inline-block relative text-gray-900 after:block after:w-full after:h-2 after:bg-sky-200 after:absolute after:bottom-1 after:left-0 after:-z-10 after:rounded-full after:opacity-70'>
-                        บุคลากรหลัก: ผู้ขับเคลื่อนกลยุทธ์และนวัตกรรมระบบ MIS
-                    </span>
+        <section className="py-20 bg-black/10 backdrop-blur-sm">
+          <div className="container mx-auto px-4 max-w-7xl">
+            <div className="text-center mb-12">
+                <h2 className="text-3xl font-extrabold text-white">
+                    เบื้องหลังความสำเร็จ
                 </h2>
-                
-                {/* Grid 2 คอลัมน์ที่บังคับความสูงเท่ากัน */}
-                <div className='grid md:grid-cols-2 gap-8 items-stretch'>
-                    
-                    {/* LEFT COLUMN: Staff List (Compact & Accent Bar) */}
-                    <div className="space-y-3 max-w-xl md:max-w-full mx-auto md:mx-0">
-                        {PHR_DAN_SAI_PERSONNEL.map((person, i) => (
-                            <div 
-                                key={i}
-                                className={personnelRowClassCompact}
-                            >
-                                {/* Diagonal Gradient Overlay */}
-                                <div className={hoverOverlayClassPersonnel} />
-
-                                {/* Minimalist Profile Icon (z-10) - ใช้ Text Symbol แทน */}
-                                <div className={profileIconClassCompact}>
-                                  {person.iconInitial}
-                                </div>
-
-                                <div className='flex flex-col text-left z-10 flex-grow'>
-                                    <h3 className={'text-sm font-bold ' + ACCENT_COLOR_CLASS}>{person.name}</h3>
-                                    <p className="text-gray-600 text-xs font-medium">{person.position}</p>
-                                    <p className="text-gray-500 text-[10px] mt-0.5 leading-snug truncate-lines-2">{person.description}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    
-                    {/* RIGHT COLUMN: Diagram Placeholder (ความสูงขนานกับด้านซ้าย) */}
-                    <div className='hidden md:flex flex-col justify-center items-center p-6 bg-gray-50 rounded-2xl border border-gray-300 shadow-md h-full'>
-                        <h3 className={'text-xl font-bold mb-4 ' + ACCENT_COLOR_TITLE}>แผนผังแสดงการเชื่อมโยงระบบ</h3>
-                        <div className='flex-grow w-full flex items-center justify-center'>
-                             <img 
-                                src={INTERCONNECTION_DIAGRAM_URL} 
-                                alt="System Interconnection Diagram" 
-                                className="w-full h-full max-h-[400px] object-contain rounded-xl border border-gray-300"
-                            />
-                        </div>
-                        <p className='text-sm text-gray-500 mt-4'>*แสดงการไหลของข้อมูลระหว่างหน่วยงานหลัก</p>
-                    </div>
-                </div>
+                <p className="text-lg text-slate-300 mt-2">
+                    ขับเคลื่อนโดยบุคลากรและองค์ความรู้ที่เราพัฒนาขึ้นเอง
+                </p>
             </div>
+
+            <div className="grid md:grid-cols-2 gap-x-12 gap-y-16">
+              <div id="personnel">
+                <h3 className="text-xl font-bold border-b-2 border-blue-500 pb-3 mb-6 uppercase tracking-wider text-white">
+                  ทีมบริหารและพัฒนาระบบ
+                </h3>
+                <div className="mb-6 w-full h-48 md:h-60 rounded-lg overflow-hidden shadow-md">
+                  <img src="https://png.pngtree.com/thumb_back/fh260/back_our/20190622/ourmid/pngtree-silhouette-of-the-team-s-success-image_215394.jpg" alt="Our Team" className="w-full h-full object-cover opacity-80" />
+                </div>
+                <div className="space-y-5">
+                  {PHR_DAN_SAI_PERSONNEL.map((person, i) => (
+                    <div key={i} className="flex items-center gap-4 p-3 border-b border-white/10 hover:bg-white/10 rounded-md transition-all duration-300">
+                      <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center font-bold text-xl text-white">
+                        {person.iconInitial}
+                      </div>
+                      <div className="flex-grow">
+                        <h4 className="font-bold text-white">{person.name}</h4>
+                        <p className="text-sm text-blue-400 font-semibold">{person.position}</p>
+                        <p className="text-xs text-slate-300 mt-1 line-clamp-2">{person.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div id="blog">
+                <h3 className="text-xl font-bold border-b-2 border-blue-500 pb-3 mb-6 uppercase tracking-wider text-white">
+                  บทความและ Case Study
+                </h3>
+                <div className="mb-6 w-full h-48 md:h-60 rounded-lg overflow-hidden shadow-md">
+                  <img src="https://t3.ftcdn.net/jpg/02/76/64/42/360_F_276644254_WLTRw8cuxEqEHx0grR1pzfduxYvu9EfW.jpg" alt="ERP Articles" className="w-full h-full object-cover opacity-80" />
+                </div>
+                <div className="space-y-5">
+                  {ERP_ARTICLES.map((article, i) => (
+                    <div key={i} className="flex items-center gap-4 p-3 border-b border-white/10 hover:bg-white/10 rounded-md transition-all duration-300">
+                      <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden">
+                        <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-grow">
+                        <h4 className="font-bold hover:text-blue-300 transition-colors cursor-pointer text-white">{article.title}</h4>
+                        <p className="text-xs text-slate-300 mt-1">
+                          <span className="font-semibold text-blue-400 bg-blue-500/10 px-2 py-1 rounded-md">{article.category}</span>
+                          <span className="mx-2">|</span>
+                          <span>{article.date}</span>
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <section id="announcements" className="py-20">
+            <div className="container mx-auto px-4 max-w-4xl">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl lg:text-4xl font-extrabold text-white">
+                ประกาศและข่าวสาร
+                </h2>
+                <p className="text-lg text-slate-300 mt-4">
+                ติดตามข่าวสาร, การอัปเดตเวอร์ชัน, และประกาศสำคัญจากทีมพัฒนาระบบ
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                {ANNOUNCEMENTS.map((item, index) => (
+                  <div key={index} className="p-6 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 transition-all duration-300 hover:border-blue-400 hover:bg-white/10">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                      <span className={`text-xs font-bold py-1 px-3 rounded-full mb-2 sm:mb-0
+                        ${item.category === 'อัปเดตระบบ' ? 'bg-blue-500/20 text-blue-300' : ''}
+                        ${item.category === 'ประกาศอบรม' ? 'bg-green-500/20 text-green-300' : ''}
+                        ${item.category === 'ซ่อมบำรุง' ? 'bg-yellow-500/20 text-yellow-300' : ''}
+                      `}>
+                        {item.category}
+                      </span>
+                      <p className="text-sm text-slate-400">{item.date}</p>
+                    </div>
+                    <h3 className="text-lg font-bold text-white mt-3">{item.title}</h3>
+                    <p className="text-slate-300 mt-2 text-sm leading-relaxed">{item.description}</p>
+                  </div>
+                ))}
+              </div>
+          </div>
         </section>
 
-        {/* Signup Section (Contact/Consultation) */}
-        <section id="signup" className="py-32 bg-gray-900 text-center text-white border-t border-gray-800">
+        <section id="signup" className="py-20">
           <div className="container mx-auto px-4 max-w-7xl">
-            <h2 className="text-4xl font-extrabold text-gray-100">เริ่มต้นการเปลี่ยนแปลง: ปรึกษาผู้เชี่ยวชาญด้านกลยุทธ์ ERP ฟรี!</h2>
-            <p className="text-xl text-gray-400 mt-4">กรอกข้อมูลเพื่อรับคำปรึกษาส่วนตัวเชิงลึก และบทวิเคราะห์ล่าสุดจากทีมงานของเรา</p>
-            <form className="mt-10 max-w-xl mx-auto grid gap-4">
-              <input
-                type="text"
-                placeholder="ชื่อบริษัท"
-                className={inputClass}
-              />
-              <input
-                type="email"
-                placeholder="อีเมล"
-                className={inputClass}
-              />
-              <input
-                type="tel"
-                placeholder="เบอร์โทร"
-                className={inputClass}
-              />
-              <button className={primaryButtonClass.replace('py-3 px-8', 'py-3 px-6')}>
-                ขอคำปรึกษาเชิงลึก &rarr;
-              </button>
-            </form>
+            <div className="bg-white/5 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden border border-white/10">
+              <div className="grid lg:grid-cols-2 gap-0">
+                <div className="p-8 lg:p-10 flex flex-col justify-center">
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-blue-500/20 rounded-xl">
+                                <svg className="w-7 h-7 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-extrabold leading-tight text-white">สนใจศึกษาดูงานหรือขอคำปรึกษา?</h2>
+                                <p className="text-slate-300">ติดต่อทีมพัฒนาระบบ ERP รพร.ด่านซ้าย</p>
+                            </div>
+                        </div>
+                        <p className="text-slate-300 text-base leading-relaxed">
+                          เราพร้อมแบ่งปันองค์ความรู้และประสบการณ์ในการพัฒนาระบบเพื่อนำไปปรับใช้และต่อยอดสำหรับโรงพยาบาลอื่นๆ
+                        </p>
+                        <div className="space-y-3 pt-4 border-t border-white/10">
+                            <div className="flex items-center gap-3">
+                                <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-blue-500/20 text-blue-300">
+                                    <span className="text-sm font-bold">✓</span>
+                                </div>
+                                <span className="text-sm">แลกเปลี่ยนประสบการณ์พัฒนาระบบ</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-blue-500/20 text-blue-300">
+                                    <span className="text-sm font-bold">✓</span>
+                                </div>
+                                <span className="text-sm">ดูงานสาธิตการใช้งานระบบจริง</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-blue-500/20 text-blue-300">
+                                    <span className="text-sm font-bold">✓</span>
+                                </div>
+                                <span className="text-sm">รับคำปรึกษาในการนำไปปรับใช้</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="p-8 lg:p-10">
+                  <form className="space-y-5">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-300 mb-2">
+                        ชื่อโรงพยาบาล / หน่วยงาน
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="กรอกชื่อหน่วยงานของคุณ"
+                        className="w-full border-2 border-white/20 bg-white/5 p-3 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white/10 transition"
+                      />
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">
+                          อีเมลผู้ติดต่อ
+                        </label>
+                        <input
+                          type="email"
+                          placeholder="your@email.com"
+                          className="w-full border-2 border-white/20 bg-white/5 p-3 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white/10 transition"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">
+                          เบอร์โทรศัพท์
+                        </label>
+                        <input
+                          type="tel"
+                          placeholder="0XX-XXX-XXXX"
+                          className="w-full border-2 border-white/20 bg-white/5 p-3 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white/10 transition"
+                        />
+                      </div>
+                    </div>
+                    <button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-4 rounded-lg shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-[1.02]">
+                      ส่งเรื่องติดต่อทีมพัฒนา &rarr;
+                    </button>
+                    <p className="text-xs text-slate-400 text-center mt-4">
+                      🔒 ข้อมูลของคุณจะถูกเก็บเป็นความลับ
+                    </p>
+                  </form>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </main>
 
-      {/* Global CSS for animations and Custom Shadow */}
       <style jsx global>{`
         @keyframes floatStars {
           0% {
@@ -288,122 +507,43 @@ export default function Home() {
             opacity: 0;
           }
         }
-
         .animate-floatStars {
           animation: floatStars linear infinite;
         }
-
-        /* *** Scroll Reveal Animation Keyframes (Fade In Up) *** */
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+          from { opacity: 0; transform: translateY(40px); }
+          to { opacity: 1; transform: translateY(0); }
         }
-
-        /* Custom Shadow for Personnel Section Elevation */
-        .shadow-inner-custom {
-            box-shadow: inset 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 0 10px rgba(0, 0, 0, 0.05);
+        @keyframes scrollRightToLeft {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
         }
-        
-        /* *** Inner Glow Hover Effect for Modules Section *** */
-        .module-card-effect:hover {
-            box-shadow: inset 0 0 15px rgba(14, 165, 233, 0.4), 0 8px 25px rgba(0, 0, 0, 0.8);
-            background-color: #172554; 
+        @keyframes scrollLeftToRight {
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
         }
-        
-        /* *** Default State for Scroll Reveal (Hidden) *** */
-        .module-card {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        .scroll-container {
+          overflow: hidden;
+          position: relative;
+          width: 100%;
         }
-
-        /* *** Final State for Scroll Reveal (Visible) *** */
-        .module-card.is-visible {
-            animation: fadeInUp 0.7s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+        .scroll-content {
+          display: flex;
+          gap: 1.5rem;
+          width: fit-content;
         }
-
-        /* *** Sequential Delay for Module Cards (Based on data-delay) *** */
-        .module-card[data-delay="0"].is-visible { animation-delay: 0s; }
-        .module-card[data-delay="1"].is-visible { animation-delay: 0.1s; }
-        .module-card[data-delay="2"].is-visible { animation-delay: 0.2s; }
-        .module-card[data-delay="3"].is-visible { animation-delay: 0.3s; }
-        .module-card[data-delay="4"].is-visible { animation-delay: 0.4s; }
-        .module-card[data-delay="5"].is-visible { animation-delay: 0.5s; }
-        .module-card[data-delay="6"].is-visible { animation-delay: 0.6s; }
-        .module-card[data-delay="7"].is-visible { animation-delay: 0.7s; }
-        .module-card[data-delay="8"].is-visible { animation-delay: 0.8s; }
-
-        
-        /* *** Lineal Emojis: Default State (Line) *** */
-        .icon-pure-outline-style {
-            font-size: 1.5rem; 
-            font-weight: 600; 
-            color: #38bdf8; 
-            filter: grayscale(100%) contrast(1.5) brightness(1.5) drop-shadow(0 0 0.5px #38bdf8);
-            transition: color 300ms, filter 300ms;
+        .scroll-right-to-left {
+          animation: scrollRightToLeft 40s linear infinite;
         }
-        
-        /* *** Lineal Emojis: Hover State (Soft Curved Gradient Fill) *** */
-        .group:hover .icon-pure-outline-style {
-            background-image: radial-gradient(circle at 50% 50%, #cff4ff 0%, #38bdf8 100%); 
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-fill-color: transparent;
-            filter: none; 
+        .scroll-left-to-right {
+          animation: scrollLeftToRight 40s linear infinite;
         }
-
-        /* Diagonal Gradient Hover Keyframes (Personnel Section - Light Theme) */
-        @keyframes diagonalMove {
-          0% {
-            transform: translate(-100%, 100%); 
-          }
-          100% {
-            transform: translate(0%, 0%); 
-          }
+        .scroll-container:hover .scroll-content {
+          animation-play-state: paused;
         }
-
-        .bg-gradient-hover {
-          background: linear-gradient(135deg, ${GRADIENT_FROM} 0%, ${GRADIENT_TO} 70%);
-          width: 200%;
-          height: 200%;
-          transform: translate(-100%, 100%); 
+        .scroll-item {
+          position: relative;
         }
-
-        .group:hover .${hoverOverlayClassPersonnel.split(' ').filter(cls => cls.startsWith('bg-')).join('.')} {
-          opacity: 1;
-          animation: diagonalMove 0.6s ease-out forwards; 
-        }
-        
-        .group:hover h3 {
-          color: #0c4a6e !important; 
-        }
-        .group:hover .${ACCENT_COLOR_CLASS.replace('text-gray-900', 'text-sky-800')} {
-            color: #0c4a6e !important; 
-        }
-        .group:hover .text-gray-600, .group:hover .text-gray-500 {
-            color: #4b5563; 
-        }
-        
-        .group:hover .${profileIconClassCompact.split(' ').filter(cls => cls.startsWith('bg-') || cls.startsWith('text-')).join('.')} {
-            background-color: #0c4a6e; 
-            color: white; 
-            border-color: #0c4a6e;
-        }
-
-        .truncate-lines-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2; 
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
       `}</style>
     </div>
   );

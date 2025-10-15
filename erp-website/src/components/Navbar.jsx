@@ -1,79 +1,141 @@
-// components/Navbar.tsx (หรือ .jsx)
+// components/Navbar.jsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import PropTypes from 'prop-types'; // 1. Import PropTypes
 
-const Navbar = () => {
+// ไอคอนลูกศรสำหรับเมนูย่อย
+const ChevronDownIcon = () => (
+  <svg className="w-4 h-4 ml-1.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+  </svg>
+);
+
+// 2. ลบ interface ออก และเปลี่ยน component เป็นฟังก์ชัน JavaScript ปกติ
+const Navbar = ({ modules }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isModulesMenuOpen, setIsModulesMenuOpen] = useState(false);
+  const [isMobileModulesOpen, setIsMobileModulesOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100);
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks = [
-    { name: 'Features', href: '#features' },
-    { name: 'Pricing', href: '#pricing' },
-    { name: 'Blog', href: '#blog' },
-    { name: 'Docs', href: '#docs' },
-  ];
-
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const closeMobileMenu = () => {
+    setIsMenuOpen(false);
+  };
 
   const navbarClasses = isScrolled
-    ? 'fixed top-0 w-full z-50 bg-white/95 backdrop-blur-md shadow-lg transition-all duration-300 border-b border-gray-100'
+    ? 'fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-lg shadow-lg shadow-blue-500/10 transition-all duration-300 border-b border-white/10'
     : 'absolute top-0 w-full z-50 transition-all duration-300';
-
-  const textColor = isScrolled ? 'text-gray-900' : 'text-white';
-  const hoverTextColor = isScrolled ? 'hover:text-[#5b7ddb]' : 'hover:text-gray-200';
-  const ctaBgColor = isScrolled ? 'bg-[#5b7ddb] text-white hover:bg-[#4a63b0]' : 'bg-white text-[#5b7ddb] hover:bg-gray-100';
 
   return (
     <header className={navbarClasses}>
-      <style>{`html { scroll-behavior: smooth; }`}</style> {/* Smooth Scroll CSS */}
+      <style>{`html { scroll-behavior: smooth; }`}</style>
       <div className="container mx-auto px-4 max-w-7xl">
-        <nav className="flex items-center justify-between h-16 py-2">
-          <Link href="/" className={`flex items-center space-x-2 text-2xl font-extrabold ${textColor} ${hoverTextColor}`}>
-            <Image src="/logo.webp" alt="ERP Website Logo" width={30} height={30} className="rounded-full" />
-            <span>ERP Website</span>
+        <nav className="flex items-center justify-between h-20 py-2">
+          {/* Logo and Site Name */}
+          <Link href="/" className="flex items-center space-x-3 text-2xl font-extrabold group">
+             <div className="relative w-10 h-10">
+               <div className="absolute inset-0 bg-blue-500 rounded-full blur-md opacity-50 group-hover:opacity-75 transition duration-300"></div>
+               <Image 
+                 src="/logo.webp" 
+                 alt="ERP Website Logo" 
+                 width={40} 
+                 height={40} 
+                 className="relative rounded-full border-2 border-white/20 group-hover:border-blue-400/50 transition-all duration-300" 
+               />
+             </div>
+             <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-slate-100 group-hover:from-white group-hover:to-blue-300 transition-all duration-300">
+               ERP Website
+             </span>
           </Link>
-          <div className="hidden md:flex items-center space-x-7">
-            {navLinks.map(link => (
-              <a key={link.name} href={link.href} className={`${textColor} ${hoverTextColor} relative group`}>
-                {link.name}
-                <span className={`absolute left-0 bottom-[-5px] h-0.5 ${isScrolled ? 'bg-[#5b7ddb]' : 'bg-white'} w-0 group-hover:w-full transition-all duration-300`}></span>
-              </a>
-            ))}
-            <Link href="#signup" className={`ml-6 font-bold py-2 px-5 rounded-full text-base transition duration-300 shadow-lg ${ctaBgColor}`}>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link href="/" className="text-slate-100 hover:text-blue-400 font-medium transition-colors">หน้าแรก</Link>
+            
+            <div 
+              className="relative"
+              onMouseEnter={() => setIsModulesMenuOpen(true)}
+              onMouseLeave={() => setIsModulesMenuOpen(false)}
+            >
+              <button className="flex items-center text-slate-100 hover:text-blue-400 font-medium transition-colors">
+                โมดูล <ChevronDownIcon />
+              </button>
+              <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-4 w-max transition-all duration-300 ease-in-out
+                ${isModulesMenuOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-4'}`}
+              >
+                <div className="bg-slate-800/90 backdrop-blur-xl rounded-lg shadow-2xl border border-white/10 p-6">
+                  <div className="grid grid-cols-3 gap-x-8 gap-y-5">
+                    {modules.map((mod) => (
+                      <a key={mod.title} href="#modules" className="flex items-center gap-3 group p-2 rounded-md hover:bg-blue-500/10">
+                        <div className="text-blue-400 group-hover:text-white transition-colors"><mod.Icon size={24} /></div>
+                        <span className="text-slate-200 group-hover:text-white font-medium text-sm transition-colors">{mod.title}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <Link href="#blog" className="text-slate-100 hover:text-blue-400 font-medium transition-colors">บทความ</Link>
+            <Link href="#announcements" className="text-slate-100 hover:text-blue-400 font-medium transition-colors">ประกาศ</Link>
+            <Link href="#signup" className="text-slate-100 hover:text-blue-400 font-medium transition-colors">ติดต่อเรา</Link>
+
+            <Link href="#signup" className="ml-6 font-bold py-2.5 px-6 rounded-full text-base transition-all duration-300 transform hover:scale-105 bg-blue-600 text-white hover:bg-blue-500 shadow-lg">
               Sign up
             </Link>
           </div>
-          <button onClick={toggleMenu} className={`md:hidden text-3xl ${textColor}`}>{isMenuOpen ? '✕' : '☰'}</button>
+          
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden text-3xl text-slate-100">{isMenuOpen ? '✕' : '☰'}</button>
         </nav>
       </div>
 
-      {/* Mobile Dropdown */}
-      <div className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${isMenuOpen ? 'max-h-96 opacity-100 py-4' : 'max-h-0 opacity-0'} bg-white shadow-xl border-t border-gray-100`}>
-        <div className="flex flex-col space-y-3 px-4">
-          {navLinks.map(link => (
-            <a key={link.name} href={link.href} className="text-gray-700 hover:text-[#5b7ddb] py-2 border-b" onClick={toggleMenu}>
-              {link.name}
-            </a>
-          ))}
-          <a href="#signup" className="mt-4 bg-[#5b7ddb] text-white font-bold py-2 text-center rounded-full hover:bg-[#4a63b0]" onClick={toggleMenu}>
+      <div className={`md:hidden overflow-y-auto transition-all duration-500 ease-in-out ${isMenuOpen ? 'max-h-screen' : 'max-h-0 opacity-0'} bg-slate-900/95 backdrop-blur-xl border-t border-white/10`}>
+        <div className="flex flex-col space-y-2 px-5 py-5">
+          <a href="/" className="text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md" onClick={closeMobileMenu}>หน้าแรก</a>
+          
+          <div>
+            <button onClick={() => setIsMobileModulesOpen(!isMobileModulesOpen)} className="w-full flex justify-between items-center text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md">
+              <span>โมดูล</span>
+              <span className={`transform transition-transform duration-300 ${isMobileModulesOpen ? 'rotate-180' : ''}`}><ChevronDownIcon/></span>
+            </button>
+            <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isMobileModulesOpen ? 'max-h-96' : 'max-h-0'}`}>
+              <div className="pl-6 pt-2 flex flex-col items-start">
+                {modules.map((mod) => (
+                  <a key={mod.title} href="#modules" className="text-slate-300 hover:text-white py-2" onClick={closeMobileMenu}>
+                    {mod.title}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          <a href="#blog" className="text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md" onClick={closeMobileMenu}>บทความ</a>
+          <a href="#announcements" className="text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md" onClick={closeMobileMenu}>ประกาศ</a>
+          <a href="#signup" className="text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md" onClick={closeMobileMenu}>ติดต่อเรา</a>
+          
+          <a href="#signup" className="mt-4 bg-blue-600 text-white font-bold py-3 text-center rounded-full" onClick={closeMobileMenu}>
             Sign up
           </a>
         </div>
       </div>
     </header>
   );
+};
+
+// 3. เพิ่มการตรวจสอบ props ด้วย PropTypes
+Navbar.propTypes = {
+  modules: PropTypes.arrayOf(PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    Icon: PropTypes.elementType.isRequired,
+  })).isRequired,
 };
 
 export default Navbar;
