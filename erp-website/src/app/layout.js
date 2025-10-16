@@ -17,6 +17,7 @@ export const metadata = {
   description: 'ระบบ ERP พัฒนาโดยทีม รพร.ด่านซ้าย',
 };
 
+
 export default function RootLayout({ children }) {
   return (
     // 3. กำหนดตัวแปรฟอนต์ให้กับ <html> tag
