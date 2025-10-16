@@ -2,86 +2,19 @@
 
 import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
-
-// Custom SVG Icons Component
-const Icons = {
-  CreditCard: ({ size = 24, strokeWidth = 2, ...props }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-      <line x1="1" y1="10" x2="23" y2="10"/>
-    </svg>
-  ),
-  Users: ({ size = 24, strokeWidth = 2, ...props }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-      <circle cx="9" cy="7" r="4"/>
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-    </svg>
-  ),
-  Package: ({ size = 24, strokeWidth = 2, ...props }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="M16.5 9.4l-9-5.19"/>
-      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-      <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-      <line x1="12" y1="22.08" x2="12" y2="12"/>
-    </svg>
-  ),
-  ShieldCheck: ({ size = 24, strokeWidth = 2, ...props }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-      <polyline points="9 12 11 14 15 10"/>
-    </svg>
-  ),
-  FileText: ({ size = 24, strokeWidth = 2, ...props }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-      <polyline points="14 2 14 8 20 8"/>
-      <line x1="16" y1="13" x2="8" y2="13"/>
-      <line x1="16" y1="17" x2="8" y2="17"/>
-      <polyline points="10 9 9 9 8 9"/>
-    </svg>
-  ),
-  ShoppingCart: ({ size = 24, strokeWidth = 2, ...props }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <circle cx="9" cy="21" r="1"/>
-      <circle cx="20" cy="21" r="1"/>
-      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-    </svg>
-  ),
-  Settings: ({ size = 24, strokeWidth = 2, ...props }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <circle cx="12" cy="12" r="3"/>
-      <path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m-2.8 2.8l-4.2 4.2m10.4 0l-4.2-4.2M7.8 7.8L3.6 3.6"/>
-      <path d="M20.66 12A8.66 8.66 0 0 1 12 20.66 8.66 8.66 0 0 1 3.34 12 8.66 8.66 0 0 1 12 3.34 8.66 8.66 0 0 1 20.66 12z"/>
-    </svg>
-  ),
-  Megaphone: ({ size = 24, strokeWidth = 2, ...props }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="m3 11 18-5v12L3 14v-3z"/>
-      <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>
-    </svg>
-  ),
-  BarChart3: ({ size = 24, strokeWidth = 2, ...props }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="M3 3v18h18"/>
-      <path d="M18 17V9"/>
-      <path d="M13 17V5"/>
-      <path d="M8 17v-3"/>
-    </svg>
-  ),
-};
+import Link from 'next/link'; // เพิ่ม import Link
+import { MIS_MODULES } from '../data/modules'; // เพิ่ม import MIS_MODULES
 
 export default function Home() {
   const [stars, setStars] = useState([]);
   const [moduleView, setModuleView] = useState('grid');
-  
+
   const HERO_IMAGES = [
     "https://levinci.group/wp-content/uploads/2024/04/why-should-business-use-ERP-1024x611.jpg",
     "https://tigersoft.co.th/wp-content/uploads/2023/08/blog21.jpg",
     "https://mayade.co.th/wp-content/uploads/2022/06/SeekPng.com_dmk-logo-png_8986300.png"
   ];
-  
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -117,18 +50,6 @@ export default function Home() {
       date: "1 ต.ค. 2568",
       imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR046PbhkzVlnjZqKVjn-XtOjNdwSiaPREiUw&s"
     },
-  ];
-
-  const MIS_MODULES = [
-    { title: 'การเงิน & บัญชี (FIN)', desc: 'บริหารงบประมาณ การเบิกจ่าย และระบบสินไหมอัตโนมัติ', Icon: Icons.CreditCard },
-    { title: 'ทรัพยากรบุคคล (HRM)', desc: 'บริหารจัดการข้อมูลบุคลากร เงินเดือน และการบริหารเวร', Icon: Icons.Users },
-    { title: 'คลังเวชภัณฑ์ (INV)', desc: 'ควบคุมสต็อกคลังเวชภัณฑ์ การรับเข้า-เบิกออก', Icon: Icons.Package },
-    { title: 'บริหารคุณภาพ (QM & RM)', desc: 'บริหารความเสี่ยง และติดตามตัวชี้วัดคุณภาพบริการ', Icon: Icons.ShieldCheck },
-    { title: 'เวชระเบียน (HIS/EHR)', desc: 'เชื่อมต่อ HOSxP และจัดการเอกสารผู้ป่วยดิจิทัล', Icon: Icons.FileText },
-    { title: 'การจัดซื้อจัดจ้าง (PROC)', desc: 'วางแผนจัดซื้อ ติดตามการเบิกจ่าย และควบคุมต้นทุน', Icon: Icons.ShoppingCart },
-    { title: 'ระบบซ่อมบำรุง (PM)', desc: 'วางแผนและติดตามการบำรุงรักษาอุปกรณ์และเครื่องมือแพทย์', Icon: Icons.Settings },
-    { title: 'การตลาด & สื่อสารองค์กร', desc: 'บริหารจัดการแคมเปญส่งเสริมสุขภาพและการสื่อสารองค์กร', Icon: Icons.Megaphone },
-    { title: 'รายงานเชิงวิเคราะห์ (BI)', desc: 'ประมวลผลข้อมูลเพื่อแสดง Dashboard และสนับสนุนการตัดสินใจ', Icon: Icons.BarChart3 },
   ];
 
   const ANNOUNCEMENTS = [
@@ -216,7 +137,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div 
+              <div
                 className="relative flex justify-center lg:justify-end group"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
@@ -246,14 +167,21 @@ export default function Home() {
                 <h3 className="text-2xl font-bold text-white tracking-wide">
                   องค์ประกอบหลักของระบบ
                 </h3>
-                <div className="flex items-center gap-2 rounded-lg p-1 bg-white/10">
-                  <button onClick={() => setModuleView('scroll')} className={`px-3 py-1 rounded-md text-sm transition-colors ${moduleView === 'scroll' ? 'bg-blue-600 text-white shadow' : 'text-slate-300 hover:bg-white/10'}`}>
-                    เลื่อน
-                  </button>
-                  <button onClick={() => setModuleView('grid')} className={`px-3 py-1 rounded-md text-sm transition-colors ${moduleView === 'grid' ? 'bg-blue-600 text-white shadow' : 'text-slate-300 hover:bg-white/10'}`}>
-                    ตาราง
-                  </button>
+                {/* ===== ส่วนที่แก้ไข ===== */}
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 rounded-lg p-1 bg-white/10">
+                    <button onClick={() => setModuleView('scroll')} className={`px-3 py-1 rounded-md text-sm transition-colors ${moduleView === 'scroll' ? 'bg-blue-600 text-white shadow' : 'text-slate-300 hover:bg-white/10'}`}>
+                      เลื่อน
+                    </button>
+                    <button onClick={() => setModuleView('grid')} className={`px-3 py-1 rounded-md text-sm transition-colors ${moduleView === 'grid' ? 'bg-blue-600 text-white shadow' : 'text-slate-300 hover:bg-white/10'}`}>
+                      ตาราง
+                    </button>
+                  </div>
+                  <Link href="/modules" className="text-sm font-semibold text-blue-300 hover:text-blue-200 transition-colors">
+                    ดูทั้งหมด &rarr;
+                  </Link>
                 </div>
+                {/* ===== จบส่วนที่แก้ไข ===== */}
               </div>
               <p className="text-center text-slate-300 mb-10 -mt-4">
                 9 เครื่องมือสำคัญที่เชื่อมต่อการทำงานของโรงพยาบาลให้เป็นหนึ่งเดียว
@@ -311,12 +239,12 @@ export default function Home() {
         <section className="py-20 bg-black/10 backdrop-blur-sm">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="text-center mb-12">
-                <h2 className="text-3xl font-extrabold text-white">
-                    เบื้องหลังความสำเร็จ
-                </h2>
-                <p className="text-lg text-slate-300 mt-2">
-                    ขับเคลื่อนโดยบุคลากรและองค์ความรู้ที่เราพัฒนาขึ้นเอง
-                </p>
+              <h2 className="text-3xl font-extrabold text-white">
+                เบื้องหลังความสำเร็จ
+              </h2>
+              <p className="text-lg text-slate-300 mt-2">
+                ขับเคลื่อนโดยบุคลากรและองค์ความรู้ที่เราพัฒนาขึ้นเอง
+              </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-x-12 gap-y-16">
@@ -371,36 +299,36 @@ export default function Home() {
             </div>
           </div>
         </section>
-        
-        <section id="announcements" className="py-20">
-            <div className="container mx-auto px-4 max-w-4xl">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl lg:text-4xl font-extrabold text-white">
-                ประกาศและข่าวสาร
-                </h2>
-                <p className="text-lg text-slate-300 mt-4">
-                ติดตามข่าวสาร, การอัปเดตเวอร์ชัน, และประกาศสำคัญจากทีมพัฒนาระบบ
-                </p>
-              </div>
 
-              <div className="space-y-6">
-                {ANNOUNCEMENTS.map((item, index) => (
-                  <div key={index} className="p-6 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 transition-all duration-300 hover:border-blue-400 hover:bg-white/10">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                      <span className={`text-xs font-bold py-1 px-3 rounded-full mb-2 sm:mb-0
-                        ${item.category === 'อัปเดตระบบ' ? 'bg-blue-500/20 text-blue-300' : ''}
-                        ${item.category === 'ประกาศอบรม' ? 'bg-green-500/20 text-green-300' : ''}
-                        ${item.category === 'ซ่อมบำรุง' ? 'bg-yellow-500/20 text-yellow-300' : ''}
-                      `}>
-                        {item.category}
-                      </span>
-                      <p className="text-sm text-slate-400">{item.date}</p>
-                    </div>
-                    <h3 className="text-lg font-bold text-white mt-3">{item.title}</h3>
-                    <p className="text-slate-300 mt-2 text-sm leading-relaxed">{item.description}</p>
+        <section id="announcements" className="py-20">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl lg:text-4xl font-extrabold text-white">
+              ประกาศและข่าวสาร
+              </h2>
+              <p className="text-lg text-slate-300 mt-4">
+              ติดตามข่าวสาร, การอัปเดตเวอร์ชัน, และประกาศสำคัญจากทีมพัฒนาระบบ
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              {ANNOUNCEMENTS.map((item, index) => (
+                <div key={index} className="p-6 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 transition-all duration-300 hover:border-blue-400 hover:bg-white/10">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                    <span className={`text-xs font-bold py-1 px-3 rounded-full mb-2 sm:mb-0
+                      ${item.category === 'อัปเดตระบบ' ? 'bg-blue-500/20 text-blue-300' : ''}
+                      ${item.category === 'ประกาศอบรม' ? 'bg-green-500/20 text-green-300' : ''}
+                      ${item.category === 'ซ่อมบำรุง' ? 'bg-yellow-500/20 text-yellow-300' : ''}
+                    `}>
+                      {item.category}
+                    </span>
+                    <p className="text-sm text-slate-400">{item.date}</p>
                   </div>
-                ))}
-              </div>
+                  <h3 className="text-lg font-bold text-white mt-3">{item.title}</h3>
+                  <p className="text-slate-300 mt-2 text-sm leading-relaxed">{item.description}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -409,40 +337,40 @@ export default function Home() {
             <div className="bg-white/5 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden border border-white/10">
               <div className="grid lg:grid-cols-2 gap-0">
                 <div className="p-8 lg:p-10 flex flex-col justify-center">
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-blue-500/20 rounded-xl">
-                                <svg className="w-7 h-7 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                            </div>
-                            <div>
-                                <h2 className="text-2xl font-extrabold leading-tight text-white">สนใจศึกษาดูงานหรือขอคำปรึกษา?</h2>
-                                <p className="text-slate-300">ติดต่อทีมพัฒนาระบบ ERP รพร.ด่านซ้าย</p>
-                            </div>
-                        </div>
-                        <p className="text-slate-300 text-base leading-relaxed">
-                          เราพร้อมแบ่งปันองค์ความรู้และประสบการณ์ในการพัฒนาระบบเพื่อนำไปปรับใช้และต่อยอดสำหรับโรงพยาบาลอื่นๆ
-                        </p>
-                        <div className="space-y-3 pt-4 border-t border-white/10">
-                            <div className="flex items-center gap-3">
-                                <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-blue-500/20 text-blue-300">
-                                    <span className="text-sm font-bold">✓</span>
-                                </div>
-                                <span className="text-sm">แลกเปลี่ยนประสบการณ์พัฒนาระบบ</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-blue-500/20 text-blue-300">
-                                    <span className="text-sm font-bold">✓</span>
-                                </div>
-                                <span className="text-sm">ดูงานสาธิตการใช้งานระบบจริง</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-blue-500/20 text-blue-300">
-                                    <span className="text-sm font-bold">✓</span>
-                                </div>
-                                <span className="text-sm">รับคำปรึกษาในการนำไปปรับใช้</span>
-                            </div>
-                        </div>
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-blue-500/20 rounded-xl">
+                        <svg className="w-7 h-7 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-extrabold leading-tight text-white">สนใจศึกษาดูงานหรือขอคำปรึกษา?</h2>
+                        <p className="text-slate-300">ติดต่อทีมพัฒนาระบบ ERP รพร.ด่านซ้าย</p>
+                      </div>
                     </div>
+                    <p className="text-slate-300 text-base leading-relaxed">
+                      เราพร้อมแบ่งปันองค์ความรู้และประสบการณ์ในการพัฒนาระบบเพื่อนำไปปรับใช้และต่อยอดสำหรับโรงพยาบาลอื่นๆ
+                    </p>
+                    <div className="space-y-3 pt-4 border-t border-white/10">
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-blue-500/20 text-blue-300">
+                          <span className="text-sm font-bold">✓</span>
+                        </div>
+                        <span className="text-sm">แลกเปลี่ยนประสบการณ์พัฒนาระบบ</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-blue-500/20 text-blue-300">
+                          <span className="text-sm font-bold">✓</span>
+                        </div>
+                        <span className="text-sm">ดูงานสาธิตการใช้งานระบบจริง</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-blue-500/20 text-blue-300">
+                          <span className="text-sm font-bold">✓</span>
+                        </div>
+                        <span className="text-sm">รับคำปรึกษาในการนำไปปรับใช้</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="p-8 lg:p-10">

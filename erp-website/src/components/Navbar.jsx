@@ -1,10 +1,10 @@
-// components/Navbar.jsx
+// src/components/Navbar.jsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // <<-- บรรทัดที่แก้ไข
 import Link from 'next/link';
 import Image from 'next/image';
-import PropTypes from 'prop-types'; // 1. Import PropTypes
+import PropTypes from 'prop-types';
 
 // ไอคอนลูกศรสำหรับเมนูย่อย
 const ChevronDownIcon = () => (
@@ -13,7 +13,6 @@ const ChevronDownIcon = () => (
   </svg>
 );
 
-// 2. ลบ interface ออก และเปลี่ยน component เป็นฟังก์ชัน JavaScript ปกติ
 const Navbar = ({ modules }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -28,6 +27,7 @@ const Navbar = ({ modules }) => {
 
   const closeMobileMenu = () => {
     setIsMenuOpen(false);
+    setIsMobileModulesOpen(false); // ปิดเมนูย่อยด้วย
   };
 
   const navbarClasses = isScrolled
@@ -65,30 +65,35 @@ const Navbar = ({ modules }) => {
               onMouseEnter={() => setIsModulesMenuOpen(true)}
               onMouseLeave={() => setIsModulesMenuOpen(false)}
             >
-              <button className="flex items-center text-slate-100 hover:text-blue-400 font-medium transition-colors">
+              <Link href="/modules" className="flex items-center text-slate-100 hover:text-blue-400 font-medium transition-colors">
                 โมดูล <ChevronDownIcon />
-              </button>
+              </Link>
               <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-4 w-max transition-all duration-300 ease-in-out
                 ${isModulesMenuOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-4'}`}
               >
                 <div className="bg-slate-800/90 backdrop-blur-xl rounded-lg shadow-2xl border border-white/10 p-6">
                   <div className="grid grid-cols-3 gap-x-8 gap-y-5">
                     {modules.map((mod) => (
-                      <a key={mod.title} href="#modules" className="flex items-center gap-3 group p-2 rounded-md hover:bg-blue-500/10">
+                      <Link 
+                        key={mod.id} 
+                        href={`/modules?module=${mod.id}`}
+                        onClick={() => setIsModulesMenuOpen(false)}
+                        className="flex items-center gap-3 group p-2 rounded-md hover:bg-blue-500/10"
+                      >
                         <div className="text-blue-400 group-hover:text-white transition-colors"><mod.Icon size={24} /></div>
                         <span className="text-slate-200 group-hover:text-white font-medium text-sm transition-colors">{mod.title}</span>
-                      </a>
+                      </Link>
                     ))}
                   </div>
                 </div>
               </div>
             </div>
 
-            <Link href="#blog" className="text-slate-100 hover:text-blue-400 font-medium transition-colors">บทความ</Link>
-            <Link href="#announcements" className="text-slate-100 hover:text-blue-400 font-medium transition-colors">ประกาศ</Link>
-            <Link href="#signup" className="text-slate-100 hover:text-blue-400 font-medium transition-colors">ติดต่อเรา</Link>
+            <Link href="/#blog" className="text-slate-100 hover:text-blue-400 font-medium transition-colors">บทความ</Link>
+            <Link href="/#announcements" className="text-slate-100 hover:text-blue-400 font-medium transition-colors">ประกาศ</Link>
+            <Link href="/#signup" className="text-slate-100 hover:text-blue-400 font-medium transition-colors">ติดต่อเรา</Link>
 
-            <Link href="#signup" className="ml-6 font-bold py-2.5 px-6 rounded-full text-base transition-all duration-300 transform hover:scale-105 bg-blue-600 text-white hover:bg-blue-500 shadow-lg">
+            <Link href="/#signup" className="ml-6 font-bold py-2.5 px-6 rounded-full text-base transition-all duration-300 transform hover:scale-105 bg-blue-600 text-white hover:bg-blue-500 shadow-lg">
               Sign up
             </Link>
           </div>
@@ -99,7 +104,7 @@ const Navbar = ({ modules }) => {
 
       <div className={`md:hidden overflow-y-auto transition-all duration-500 ease-in-out ${isMenuOpen ? 'max-h-screen' : 'max-h-0 opacity-0'} bg-slate-900/95 backdrop-blur-xl border-t border-white/10`}>
         <div className="flex flex-col space-y-2 px-5 py-5">
-          <a href="/" className="text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md" onClick={closeMobileMenu}>หน้าแรก</a>
+          <Link href="/" className="text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md" onClick={closeMobileMenu}>หน้าแรก</Link>
           
           <div>
             <button onClick={() => setIsMobileModulesOpen(!isMobileModulesOpen)} className="w-full flex justify-between items-center text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md">
@@ -109,30 +114,35 @@ const Navbar = ({ modules }) => {
             <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isMobileModulesOpen ? 'max-h-96' : 'max-h-0'}`}>
               <div className="pl-6 pt-2 flex flex-col items-start">
                 {modules.map((mod) => (
-                  <a key={mod.title} href="#modules" className="text-slate-300 hover:text-white py-2" onClick={closeMobileMenu}>
+                  <Link 
+                    key={mod.id} 
+                    href={`/modules?module=${mod.id}`} 
+                    className="text-slate-300 hover:text-white py-2" 
+                    onClick={closeMobileMenu}
+                  >
                     {mod.title}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>
           </div>
           
-          <a href="#blog" className="text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md" onClick={closeMobileMenu}>บทความ</a>
-          <a href="#announcements" className="text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md" onClick={closeMobileMenu}>ประกาศ</a>
-          <a href="#signup" className="text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md" onClick={closeMobileMenu}>ติดต่อเรา</a>
+          <Link href="/#blog" className="text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md" onClick={closeMobileMenu}>บทความ</Link>
+          <Link href="/#announcements" className="text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md" onClick={closeMobileMenu}>ประกาศ</Link>
+          <Link href="/#signup" className="text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md" onClick={closeMobileMenu}>ติดต่อเรา</Link>
           
-          <a href="#signup" className="mt-4 bg-blue-600 text-white font-bold py-3 text-center rounded-full" onClick={closeMobileMenu}>
+          <Link href="/#signup" className="mt-4 bg-blue-600 text-white font-bold py-3 text-center rounded-full" onClick={closeMobileMenu}>
             Sign up
-          </a>
+          </Link>
         </div>
       </div>
     </header>
   );
 };
 
-// 3. เพิ่มการตรวจสอบ props ด้วย PropTypes
 Navbar.propTypes = {
   modules: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     Icon: PropTypes.elementType.isRequired,
   })).isRequired,
