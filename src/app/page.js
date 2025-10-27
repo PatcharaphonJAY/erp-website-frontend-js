@@ -104,6 +104,13 @@ export default function Home() {
   const [moduleView, setModuleView] = useState('grid');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [formData, setFormData] = useState({
+    hospital: '',
+    email: '',
+    tel: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', or null
 
   // *** เพิ่มการเรียกใช้ Hook สำหรับ Hero Section ***
   const [heroRef, isHeroVisible] = useIsVisible(0.1); 
@@ -173,6 +180,60 @@ export default function Home() {
     }
   ], []);
 
+  const handleFormChange = (e) => {
+    const { id, value } = e.target;
+    
+    // ใช้ id ในการ map เข้า state (เช่น id 'hospital-name' จะ map เข้า 'hospital')
+    const stateKey = id.replace('-name', '').replace('contact-', ''); 
+
+    let processedValue = value; // 1. สร้างตัวแปรมารับค่าเริ่มต้น
+
+    // 2. เพิ่มเงื่อนไขเช็คว่า ID เป็น 'contact-tel' หรือไม่
+    if (id === 'contact-tel') {
+      // 2.1 ลบทุกอย่างที่ไม่ใช่ตัวเลข (0-9)
+      const numericValue = value.replace(/[^0-9]/g, '');
+      // 2.2 จำกัดความยาวไม่ให้เกิน 10 ตัวอักษร
+      processedValue = numericValue.slice(0, 10);
+    }
+
+    // 3. อัปเดต state ด้วยค่าที่ผ่านการกรองแล้ว
+    setFormData((prev) => ({
+      ...prev,
+      [stateKey]: processedValue,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // ป้องกันการโหลดหน้าใหม่
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        // ล้างฟอร์ม
+        setFormData({ hospital: '', email: '', tel: '' });
+      } else {
+        // ดึง error message จาก API (ถ้ามี)
+        const errorData = await response.json();
+        console.error('Submission error:', errorData.error);
+        setSubmitStatus('error');
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   // =================================================================
   // Effects & Side Effects
   // =================================================================
@@ -438,91 +499,132 @@ export default function Home() {
         </section>
 
         {/* Contact Section */}
-        <section id="signup" className="py-20 bg-black/10 border-t border-white/5">
-          <div className="container mx-auto px-4 max-w-7xl">
-            <div className="bg-[#1a293c] rounded-xl shadow-2xl shadow-black/70 overflow-hidden border border-slate-700">
-              <div className="grid lg:grid-cols-2 gap-0">
-                <div className="p-8 lg:p-12 flex flex-col justify-center bg-gradient-to-r from-[#131e32] to-[#1a293c]">
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 flex-shrink-0 flex items-center justify-center bg-sky-500/20 rounded-full">
-                        {/* ใช้ SVG ที่มี A11Y Attribute */}
-                        <svg className="w-8 h-8 text-sky-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                      </div>
-                      <div>
-                        <h2 className="text-3xl font-extrabold leading-tight text-white">ต้องการคำปรึกษา?</h2>
-                        <p className="text-slate-400 mt-1">ติดต่อทีมพัฒนาระบบ ERP รพร.ด่านซ้าย</p>
-                      </div>
-                    </div>
-                    <p className="text-slate-300 text-base leading-relaxed border-t border-slate-700/50 pt-6">
-                      เราพร้อมแบ่งปันองค์ความรู้และประสบการณ์ในการพัฒนาระบบเพื่อนำไปปรับใช้และต่อยอดสำหรับโรงพยาบาลอื่นๆ
-                    </p>
-                    <div className="space-y-3 pt-4">
-                      {['แลกเปลี่ยนประสบการณ์พัฒนาระบบ', 'ดูงานสาธิตการใช้งานระบบจริง', 'รับคำปรึกษาในการนำไปปรับใช้'].map((text, i) => (
-                        <div key={i} className="flex items-center gap-3">
-                          <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-sky-500/20 text-sky-300">
-                            <span className="text-sm font-bold">✓</span>
-                          </div>
-                          <span className="text-sm text-slate-300">{text}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Form Section */}
-                <div className="p-8 lg:p-12">
-                  <form className="space-y-6" onSubmit={(e) => e.preventDefault()}> {/* เพิ่ม onSubmit handler */}
-                    <div>
-                      <label htmlFor="hospital-name" className="block text-sm font-semibold text-slate-300 mb-2">
-                        ชื่อโรงพยาบาล / หน่วยงาน
-                      </label>
-                      <input
-                        id="hospital-name"
-                        type="text"
-                        placeholder="กรอกชื่อหน่วยงานของคุณ"
-                        required // เพิ่ม required attribute
-                        className="w-full border border-slate-700 bg-[#203045] p-3 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
-                      />
-                    </div>
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div>
-                        <label htmlFor="contact-email" className="block text-sm font-semibold text-slate-300 mb-2">
-                          อีเมลผู้ติดต่อ
-                        </label>
-                        <input
-                          id="contact-email"
-                          type="email"
-                          placeholder="your@email.com"
-                          required
-                          className="w-full border border-slate-700 bg-[#203045] p-3 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="contact-tel" className="block text-sm font-semibold text-slate-300 mb-2">
-                          เบอร์โทรศัพท์
-                        </label>
-                        <input
-                          id="contact-tel"
-                          type="tel"
-                          placeholder="0XX-XXX-XXXX"
-                          required
-                          className="w-full border border-slate-700 bg-[#203045] p-3 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
-                        />
-                      </div>
-                    </div>
-                    <button type="submit" className="w-full bg-gradient-to-r from-sky-600 to-sky-700 text-white font-bold py-4 rounded-lg shadow-xl shadow-sky-500/30 hover:from-sky-700 hover:to-sky-800 transition-all transform hover:scale-[1.01]">
-                      ส่งเรื่องติดต่อทีมพัฒนา &rarr;
-                    </button>
-                    <p className="text-xs text-slate-500 text-center pt-4">
-                      🔒 ข้อมูลของคุณจะถูกเก็บเป็นความลับและใช้เพื่อการติดต่อกลับเท่านั้น
-                    </p>
-                  </form>
-                </div>
+       {/* Contact Section */}
+<section id="signup" className="py-20 bg-black/10 border-t border-white/5">
+  <div className="container mx-auto px-4 max-w-7xl">
+    <div className="bg-[#1a293c] rounded-xl shadow-2xl shadow-black/70 overflow-hidden border border-slate-700">
+      <div className="grid lg:grid-cols-2 gap-0">
+        <div className="p-8 lg:p-12 flex flex-col justify-center bg-gradient-to-r from-[#131e32] to-[#1a293c]">
+          <div className="space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 flex-shrink-0 flex items-center justify-center bg-sky-500/20 rounded-full">
+                <svg className="w-8 h-8 text-sky-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+              </div>
+              <div>
+                <h2 className="text-3xl font-extrabold leading-tight text-white">ต้องการคำปรึกษา?</h2>
+                <p className="text-slate-400 mt-1">ติดต่อทีมพัฒนาระบบ ERP รพร.ด่านซ้าย</p>
               </div>
             </div>
+            <p className="text-slate-300 text-base leading-relaxed border-t border-slate-700/50 pt-6">
+              เราพร้อมแบ่งปันองค์ความรู้และประสบการณ์ในการพัฒนาระบบเพื่อนำไปปรับใช้และต่อยอดสำหรับโรงพยาบาลอื่นๆ
+            </p>
+            <div className="space-y-3 pt-4">
+              {['แลกเปลี่ยนประสบการณ์พัฒนาระบบ', 'ดูงานสาธิตการใช้งานระบบจริง', 'รับคำปรึกษาในการนำไปปรับใช้'].map((text, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-sky-500/20 text-sky-300">
+                    <span className="text-sm font-bold">✓</span>
+                  </div>
+                  <span className="text-sm text-slate-300">{text}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </section>
+        </div>
+
+        {/* Form Section (แก้ไขแล้ว) */}
+        <div className="p-8 lg:p-12">
+          {/* ✅ 1. ใช้ onSubmit={handleSubmit} ที่คุณมีอยู่แล้ว */}
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="hospital-name" className="block text-sm font-semibold text-slate-300 mb-2">
+                ชื่อโรงพยาบาล / หน่วยงาน
+              </label>
+              <input
+                id="hospital-name"
+                name="hospitalName" // name attribute (ไม่จำเป็นสำหรับ logic ของคุณ แต่ใส่ไว้ได้)
+                type="text"
+                placeholder="กรอกชื่อหน่วยงานของคุณ"
+                required
+                className="w-full border border-slate-700 bg-[#203045] p-3 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+                value={formData.hospital} // ✅ 2. แก้ value ให้ตรงกับ state (hospital)
+                onChange={handleFormChange} // ✅ 3. แก้เป็น handleFormChange
+                disabled={isSubmitting} // ✅ 4. แก้เป็น isSubmitting
+              />
+            </div>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="contact-email" className="block text-sm font-semibold text-slate-300 mb-2">
+                  อีเมลผู้ติดต่อ
+                </label>
+                <input
+                  id="contact-email"
+                  name="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  required
+                  className="w-full border border-slate-700 bg-[#203045] p-3 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+                  value={formData.email} // (ตัวนี้ถูกต้องอยู่แล้ว)
+                  onChange={handleFormChange} // ✅ 3. แก้เป็น handleFormChange
+                  disabled={isSubmitting} // ✅ 4. แก้เป็น isSubmitting
+                />
+              </div>
+                <div>
+                    <label htmlFor="contact-tel" className="block text-sm font-semibold text-slate-300 mb-2">
+                      เบอร์โทรศัพท์
+                    </label>
+                    <input
+                      id="contact-tel"
+                      name="tel"
+                      type="tel"
+                      placeholder="0XX-XXX-XXXX"
+                      required
+                      className="w-full border border-slate-700 bg-[#203045] p-3 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+                      value={formData.tel}
+                      onChange={handleFormChange}
+                      disabled={isSubmitting}
+                      // --- ⬇️ เพิ่ม 2 บรรทัดนี้ ⬇️ ---
+                      maxLength={10}
+                      inputMode="numeric"
+                      // --- ⬆️ สิ้นสุดส่วนที่เพิ่ม ⬆️ ---
+                    />
+                  </div>
+            </div>
+
+            {/* ✅ 5. แก้ไขส่วนแสดงข้อความ Success / Error ให้ใช้ state 'submitStatus' */}
+            {submitStatus === 'success' && (
+              <div
+                className="p-3 rounded-lg text-center text-sm font-medium bg-green-500/10 border border-green-500/30 text-green-400"
+              >
+                ส่งข้อมูลสำเร็จ! ทีมงานจะติดต่อกลับโดยเร็วที่สุด
+              </div>
+            )}
+            {submitStatus === 'error' && (
+              <div
+                className="p-3 rounded-lg text-center text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-400"
+              >
+                เกิดข้อผิดพลาด! กรุณาลองใหม่อีกครั้ง
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-sky-600 to-sky-700 text-white font-bold py-4 rounded-lg shadow-xl shadow-sky-500/30 hover:from-sky-700 hover:to-sky-800 transition-all transform hover:scale-[1.01]"
+              disabled={isSubmitting} // ✅ 6. แก้เป็น isSubmitting
+            >
+              {/* ✅ 7. แก้ไขข้อความปุ่มให้ใช้ 'isSubmitting' */}
+              {isSubmitting
+                ? 'กำลังส่งข้อมูล...'
+                : 'ส่งเรื่องติดต่อทีมพัฒนา →'}
+            </button>
+            <p className="text-xs text-slate-500 text-center pt-4">
+              🔒 ข้อมูลของคุณจะถูกเก็บเป็นความลับและใช้เพื่อการติดต่อกลับเท่านั้น
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
       </main>
 
       <style jsx global>{`
