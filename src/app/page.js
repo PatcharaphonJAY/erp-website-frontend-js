@@ -95,22 +95,23 @@ const HeroImageSlider = ({ HERO_IMAGES, currentImageIndex, setIsHovered }) => (
   </div>
 );
 
-// *** 1. เพิ่ม Component Modal สำหรับประกาศข่าวสาร ***
+// Component Modal สำหรับประกาศข่าวสาร
 const AnnouncementModal = ({ item, onClose }) => {
-  if (!item) return null; // ถ้าไม่มี item ที่เลือก ให้ซ่อน Modal
+  if (!item) return null; 
 
   return (
     <div
-      className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 p-4 transition-opacity duration-300"
-      onClick={onClose} // ปิดเมื่อคลิกที่พื้นหลัง (Backdrop)
+      // *** แก้ไข: ลดความเข้ม Black และคง Backdrop-blur ***
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-300"
+      onClick={onClose} 
       aria-modal="true"
       role="dialog"
     >
       <div
-        className="relative w-full max-w-2xl bg-[#1a293c] rounded-xl shadow-2xl border border-slate-700 overflow-hidden transform transition-all duration-300 scale-95 opacity-0 animate-fadeIn"
-        onClick={(e) => e.stopPropagation()} // ป้องกันการปิดเมื่อคลิกที่เนื้อหา
+        // *** แก้ไข: เพิ่ม max-h และ overflow-y-auto ***
+        className="relative w-full max-w-2xl bg-[#1a293c] rounded-xl shadow-2xl border border-slate-700 transition-all duration-300 scale-95 opacity-0 animate-fadeIn max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()} 
       >
-        {/* ปุ่มปิด (X) มุมบนขวา */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors z-10"
@@ -120,8 +121,6 @@ const AnnouncementModal = ({ item, onClose }) => {
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-
-        {/* เนื้อหา Modal (คัดลอกสไตล์มาจาก Card เดิม) */}
         <div className="p-6 md:p-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-700/50 pb-3 mb-4">
             <span className={`text-xs font-bold py-1 px-3 rounded-full mb-2 sm:mb-0 uppercase tracking-wider
@@ -134,42 +133,85 @@ const AnnouncementModal = ({ item, onClose }) => {
             <p className="text-sm text-slate-400 font-medium">{item.date}</p>
           </div>
           <h3 className="text-2xl font-bold text-white leading-snug mb-4">{item.title}</h3>
-          {/* ขยายเนื้อหา Description ให้ยาวขึ้น (ตัวอย่าง) */}
           <p className="text-slate-300 text-base leading-relaxed">{item.description}</p>
-          {/* <p className="text-slate-300 text-base leading-relaxed mt-4">
-              [คุณสามารถเพิ่มเนื้อหาข่าวเต็มๆ ได้ที่นี่]... Lorem ipsum dolor sit amet, 
-              consectetur adipiscing elit. Nullam in dui mauris. 
-              Vivamus hendrerit arcu sed erat molestie vehicula.
-            </p>
-          */}
         </div>
       </div>
       
-      {/* เพิ่ม CSS สำหรับ Animation (จำเป็นต้องใช้ <style jsx>) */}
       <style jsx>{`
         @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
         }
-        .animate-fadeIn {
-          animation: fadeIn 0.2s ease-out forwards;
-        }
+        .animate-fadeIn { animation: fadeIn 0.2s ease-out forwards; }
       `}</style>
     </div>
   );
 };
-// *** (สิ้นสุด Sub-Component ใหม่) ***
+
+// Component Modal สำหรับบทความ
+const ArticleModal = ({ item, onClose }) => {
+  if (!item) return null;
+
+  return (
+    <div
+      // *** แก้ไข: ลดความเข้ม Black และคง Backdrop-blur ***
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-300"
+      onClick={onClose}
+      aria-modal="true"
+      role="dialog"
+    >
+      <div
+        // *** แก้ไข: เพิ่ม max-h และ overflow-y-auto ***
+        className="relative w-full max-w-2xl bg-[#1a293c] rounded-xl shadow-2xl border border-slate-700 transition-all duration-300 scale-95 opacity-0 animate-fadeIn max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors z-10"
+          aria-label="Close modal"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <img src={item.imageUrl} alt={item.title} className="w-full h-48 md:h-60 object-cover" />
+
+        <div className="p-6 md:p-8">
+          <p className="text-xs text-slate-400 mb-3">
+            <span className="font-semibold text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-full">{item.category}</span>
+            <span className="mx-2">|</span>
+            <span>{item.date}</span>
+          </p>
+          <h3 className="text-2xl font-bold text-white leading-snug mb-4">{item.title}</h3>
+          <p className="text-slate-300 text-base leading-relaxed">
+            นี่คือเนื้อหาฉบับเต็มสำหรับบทความ "{item.title}". 
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. 
+            Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus 
+            rhoncus ut eleifend nibh porttitor.
+          </p>
+           <p className="text-slate-300 text-base leading-relaxed mt-4">
+            (เนื้อหาสมมติ) ... Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis 
+            nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.
+          </p>
+        </div>
+      </div>
+      
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fadeIn { animation: fadeIn 0.2s ease-out forwards; }
+      `}</style>
+    </div>
+  );
+};
 
 
 export default function Home() {
   // =================================================================
-  // Data Definition
+  // Data Definition & State
   // =================================================================
   const [stars, setStars] = useState([]);
   const [moduleView, setModuleView] = useState('grid');
@@ -181,13 +223,11 @@ export default function Home() {
     tel: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', or null
+  const [submitStatus, setSubmitStatus] = useState(null); 
 
-  // *** เพิ่มการเรียกใช้ Hook สำหรับ Hero Section ***
   const [heroRef, isHeroVisible] = useIsVisible(0.1); 
-
-  // *** 2. เพิ่ม State สำหรับ Modal ***
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+  const [selectedArticle, setSelectedArticle] = useState(null);
 
   const HERO_IMAGES = useMemo(() => [
     "https://levinci.group/wp-content/uploads/2024/04/why-should-business-use-ERP-1024x611.jpg",
@@ -256,47 +296,29 @@ export default function Home() {
 
   const handleFormChange = (e) => {
     const { id, value } = e.target;
-    
-    // ใช้ id ในการ map เข้า state (เช่น id 'hospital-name' จะ map เข้า 'hospital')
     const stateKey = id.replace('-name', '').replace('contact-', ''); 
-
-    let processedValue = value; // 1. สร้างตัวแปรมารับค่าเริ่มต้น
-
-    // 2. เพิ่มเงื่อนไขเช็คว่า ID เป็น 'contact-tel' หรือไม่
+    let processedValue = value; 
     if (id === 'contact-tel') {
-      // 2.1 ลบทุกอย่างที่ไม่ใช่ตัวเลข (0-9)
       const numericValue = value.replace(/[^0-9]/g, '');
-      // 2.2 จำกัดความยาวไม่ให้เกิน 10 ตัวอักษร
       processedValue = numericValue.slice(0, 10);
     }
-
-    // 3. อัปเดต state ด้วยค่าที่ผ่านการกรองแล้ว
-    setFormData((prev) => ({
-      ...prev,
-      [stateKey]: processedValue,
-    }));
+    setFormData((prev) => ({ ...prev, [stateKey]: processedValue }));
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // ป้องกันการโหลดหน้าใหม่
+    e.preventDefault(); 
     setIsSubmitting(true);
     setSubmitStatus(null);
-
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-
       if (response.ok) {
         setSubmitStatus('success');
-        // ล้างฟอร์ม
         setFormData({ hospital: '', email: '', tel: '' });
       } else {
-        // ดึง error message จาก API (ถ้ามี)
         const errorData = await response.json();
         console.error('Submission error:', errorData.error);
         setSubmitStatus('error');
@@ -309,30 +331,34 @@ export default function Home() {
     }
   };
 
-  // *** 3. เพิ่ม Handlers สำหรับ Modal ***
+  // Handlers สำหรับ Announcement Modal
   const openAnnouncementModal = (item) => {
     setSelectedAnnouncement(item);
   };
-
   const closeAnnouncementModal = () => {
     setSelectedAnnouncement(null);
+  };
+
+  // Handlers สำหรับ Article Modal
+  const openArticleModal = (item) => {
+    setSelectedArticle(item);
+  };
+  const closeArticleModal = () => {
+    setSelectedArticle(null);
   };
 
   // =================================================================
   // Effects & Side Effects
   // =================================================================
-
-  // Image Slider Interval - ใช้ HERO_IMAGES.length เป็น dependency
   useEffect(() => {
     if (!isHovered) {
       const interval = setInterval(() => {
         setCurrentImageIndex(prevIndex => (prevIndex + 1) % HERO_IMAGES.length);
       }, 4000);
-      return () => clearInterval(interval); // Cleanup Function
+      return () => clearInterval(interval); 
     }
   }, [isHovered, HERO_IMAGES.length]); 
 
-  // Star Animation Setup
   useEffect(() => {
     const generatedStars = [...Array(80)].map(() => ({
       left: Math.random() * 100,
@@ -344,44 +370,58 @@ export default function Home() {
     setStars(generatedStars);
   }, []); 
 
+  // *** เพิ่ม Effect: ล็อคการ Scroll ของ Body เมื่อ Modal เปิด ***
+  useEffect(() => {
+    if (selectedAnnouncement || selectedArticle) {
+      // เมื่อ Modal ใดๆ เปิด
+      document.body.style.overflow = 'hidden';
+    } else {
+      // เมื่อ Modal ทั้งหมดปิด
+      document.body.style.overflow = 'auto';
+    }
+    
+    // Cleanup function เพื่อคืนค่า scroll เมื่อ component unmount
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [selectedAnnouncement, selectedArticle]); // ทำงานเมื่อ state สองตัวนี้เปลี่ยน
+
+
   // =================================================================
   // JSX Render
   // =================================================================
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#131e32] to-[#0a111a] text-slate-200 relative overflow-hidden">
       <Navbar modules={MIS_MODULES} />
 
       <main className="relative z-10">
-        {/* พื้นหลังแสงสีขาวตรงกลาง */}
-        <div className="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/20 rounded-full blur-[120px]"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-200/30 rounded-full blur-[100px]"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-white/40 rounded-full blur-[80px]"></div>
-        </div>
+        {/* ... (โค้ดส่วนพื้นหลังแสงและดาวลอย) ... */}
+         <div className="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
+           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/20 rounded-full blur-[120px]"></div>
+           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-200/30 rounded-full blur-[100px]"></div>
+           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-white/40 rounded-full blur-[80px]"></div>
+         </div>
+         <div 
+           className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-50"
+           aria-hidden="true"
+         >
+           {stars.map((star, i) => (
+             <span
+               key={i}
+               className="absolute rounded-full bg-blue-300/80 animate-floatStars"
+               style={{
+                 left: `${star.left}%`,
+                 width: `${star.size}px`,
+                 height: `${star.size}px`,
+                 opacity: star.opacity,
+                 animationDelay: `-${star.delay}s`,
+                 animationDuration: `${star.duration}s`,
+               }}
+             ></span>
+           ))}
+         </div>
         
-        {/* ส่วนดาวลอย (Floating Stars) */}
-        <div 
-          className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-50"
-          aria-hidden="true"
-        >
-          {stars.map((star, i) => (
-            <span
-              key={i}
-              className="absolute rounded-full bg-blue-300/80 animate-floatStars"
-              style={{
-                left: `${star.left}%`,
-                width: `${star.size}px`,
-                height: `${star.size}px`,
-                opacity: star.opacity,
-                animationDelay: `-${star.delay}s`,
-                animationDuration: `${star.duration}s`,
-              }}
-            ></span>
-          ))}
-        </div>
-        
-        {/* ส่วน Hero Section */}
+        {/* ... (โค้ด Hero Section) ... */}
         <section 
           ref={heroRef}
           className={`pt-32 lg:pt-40 pb-20 transition-opacity duration-700 ease-out transform relative ${
@@ -416,84 +456,80 @@ export default function Home() {
               />
             </div>
           </div>
-          
-          {/* เส้นแสงด้านล่าง Hero Section */}
           <div className="absolute bottom-0 left-0 right-0 h-[1px] overflow-hidden">
             <div className="animated-border-line"></div>
           </div>
         </section>
         
-        {/* ส่วน Modules Section */}
+        {/* ... (โค้ด Modules Section) ... */}
         <section id="modules" className="py-20 bg-black/20 backdrop-blur-sm border-t border-b border-white/5 relative">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex justify-between items-end mb-8 border-b border-slate-700/50 pb-4">
-              <h3 className="text-3xl font-bold text-white tracking-tight">
-                องค์ประกอบหลักของระบบ (Modules)
-              </h3>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 rounded-lg p-1 bg-white/10 border border-slate-700">
-                  <button 
-                    onClick={() => setModuleView('scroll')} 
-                    aria-pressed={moduleView === 'scroll'}
-                    className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${moduleView === 'scroll' ? 'bg-sky-600 text-white shadow' : 'text-slate-300 hover:bg-white/10'}`}
-                  >
-                    เลื่อน
-                  </button>
-                  <button 
-                    onClick={() => setModuleView('grid')} 
-                    aria-pressed={moduleView === 'grid'}
-                    className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${moduleView === 'grid' ? 'bg-sky-600 text-white shadow' : 'text-slate-300 hover:bg-white/10'}`}
-                  >
-                    ตาราง
-                  </button>
-                </div>
-                <Link href="/modules" className="text-base font-semibold text-sky-400 hover:text-sky-300 transition-colors hidden sm:block">
-                  ดูประสิทธิภาพ &rarr;
-                </Link>
-              </div>
-            </div>
+               <h3 className="text-3xl font-bold text-white tracking-tight">
+                 องค์ประกอบหลักของระบบ (Modules)
+               </h3>
+               <div className="flex items-center gap-4">
+                 <div className="flex items-center gap-2 rounded-lg p-1 bg-white/10 border border-slate-700">
+                   <button 
+                     onClick={() => setModuleView('scroll')} 
+                     aria-pressed={moduleView === 'scroll'}
+                     className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${moduleView === 'scroll' ? 'bg-sky-600 text-white shadow' : 'text-slate-300 hover:bg-white/10'}`}
+                   >
+                     เลื่อน
+                   </button>
+                   <button 
+                     onClick={() => setModuleView('grid')} 
+                     aria-pressed={moduleView === 'grid'}
+                     className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${moduleView === 'grid' ? 'bg-sky-600 text-white shadow' : 'text-slate-300 hover:bg-white/10'}`}
+                   >
+                     ตาราง
+                   </button>
+                 </div>
+                 <Link href="/modules" className="text-base font-semibold text-sky-400 hover:text-sky-300 transition-colors hidden sm:block">
+                   ดูประสิทธิภาพ &rarr;
+                 </Link>
+               </div>
+             </div>
 
-            {moduleView === 'scroll' ? (
-              <div className="scroll-container">
-                <div className="scroll-content scroll-right-to-left">
-                  {[...MIS_MODULES, ...MIS_MODULES].map((m, i) => (
-                    <div
-                      key={`scroll-${i}-${m.title}`}
-                      className="scroll-item group p-4 rounded-xl shadow-lg transition-all duration-300 bg-[#1a293c] border border-slate-700 hover:border-sky-500 flex-shrink-0"
-                      style={{ width: '220px' }}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="text-sky-400 p-2 bg-sky-500/10 rounded-lg transition-all duration-500 group-hover:bg-sky-500 group-hover:text-white">
-                          <m.Icon size={28} strokeWidth={2} />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors duration-300">
-                            {m.title}
-                          </h4>
-                          <p className="text-[10px] text-slate-400 mt-0.5">{m.desc.split(' ').slice(0, 3).join(' ')}...</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-6">
-                {MIS_MODULES.map((m, i) => (
-                  <ModuleCard key={`grid-${i}`} m={m} />
-                ))}
-              </div>
-            )}
+             {moduleView === 'scroll' ? (
+               <div className="scroll-container">
+                 <div className="scroll-content scroll-right-to-left">
+                   {[...MIS_MODULES, ...MIS_MODULES].map((m, i) => (
+                     <div
+                       key={`scroll-${i}-${m.title}`}
+                       className="scroll-item group p-4 rounded-xl shadow-lg transition-all duration-300 bg-[#1a293c] border border-slate-700 hover:border-sky-500 flex-shrink-0"
+                       style={{ width: '220px' }}
+                     >
+                       <div className="flex items-center gap-3">
+                         <div className="text-sky-400 p-2 bg-sky-500/10 rounded-lg transition-all duration-500 group-hover:bg-sky-500 group-hover:text-white">
+                           <m.Icon size={28} strokeWidth={2} />
+                         </div>
+                         <div>
+                           <h4 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors duration-300">
+                             {m.title}
+                           </h4>
+                           <p className="text-[10px] text-slate-400 mt-0.5">{m.desc.split(' ').slice(0, 3).join(' ')}...</p>
+                         </div>
+                       </div>
+                     </div>
+                   ))}
+                 </div>
+               </div>
+             ) : (
+               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-6">
+                 {MIS_MODULES.map((m, i) => (
+                   <ModuleCard key={`grid-${i}`} m={m} />
+                 ))}
+               </div>
+             )}
           </div>
-          
-          {/* เส้นแสงด้านล่าง Modules Section */}
           <div className="absolute bottom-0 left-0 right-0 h-[1px] overflow-hidden">
             <div className="animated-border-line"></div>
           </div>
         </section>
 
-        {/* ส่วน Personnel & Blog */}
-        <section className="py-20 bg-white relative">
+        {/* *** แก้ไข: Personnel & Blog Section (พื้นหลังสีขาว) *** */}
+        <section id="personnel-and-blog" className="py-20 bg-white relative">
           <div className="container mx-auto px-4 max-w-7xl relative z-20">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-extrabold text-slate-800 tracking-tight">
@@ -537,8 +573,13 @@ export default function Home() {
                   <img src="https://t3.ftcdn.net/jpg/02/76/64/42/360_F_276644254_WLTRw8cuxEqEHx0grR1pzfduxYvu9EfW.jpg" alt="ภาพรวมบทความ ERP" className="w-full h-full object-cover opacity-70" />
                 </div>
                 <div className="space-y-4 bg-slate-50 p-6 rounded-xl border border-slate-300 shadow-lg">
+                  
                   {ERP_ARTICLES.map((article, i) => (
-                    <Link key={i} href={article.link} className="flex items-start gap-4 p-3 border border-slate-200 rounded-lg hover:bg-white transition-all duration-300 group">
+                    <button 
+                      key={i} 
+                      onClick={() => openArticleModal(article)} 
+                      className="flex items-start gap-4 p-3 border border-slate-200 rounded-lg hover:bg-white transition-all duration-300 group w-full text-left"
+                    >
                       <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-slate-300">
                         <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover" />
                       </div>
@@ -550,188 +591,190 @@ export default function Home() {
                           <span>{article.date}</span>
                         </p>
                       </div>
-                    </Link>
+                    </button>
                   ))}
+
                 </div>
               </div>
             </div>
           </div>
           
-          {/* เส้นแสงด้านล่าง Personnel & Blog Section */}
-          <div className="absolute bottom-0 left-0 right-0 h-[1px] overflow-hidden z-30">
+          {/* เส้นแสงด้านล่าง - (เอาออกเพราะพื้นหลังเป็นสีขาว) */}
+          {/* <div className="absolute bottom-0 left-0 right-0 h-[1px] overflow-hidden z-30">
             <div className="animated-border-line"></div>
-          </div>
+          </div> 
+          */}
         </section>
+        {/* *** (สิ้นสุดการแก้ไข Section) *** */}
+
 
         {/* Announcement Section */}
-        <section id="announcements" className="py-20 border-t border-white/5 relative">
+        <section id="announcements" className="py-20 bg-black/10 backdrop-blur-sm border-t border-white/5 relative">
           <div className="container mx-auto px-4 max-w-4xl">
+            {/* ... (โค้ดส่วน Announcement) ... */}
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-extrabold text-white tracking-tight">
-              ประกาศและข่าวสารสำคัญ
-              </h2>
-              <p className="text-lg text-slate-400 mt-4">
-              ติดตามข่าวสาร, การอัปเดตเวอร์ชัน, และประกาศสำคัญจากทีมพัฒนาระบบ
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              {/* *** 4. แก้ไขจาก <div> เป็น <button> และเพิ่ม onClick *** */}
-              {ANNOUNCEMENTS.map((item, index) => (
-                <button
-                  key={index}
-                  onClick={() => openAnnouncementModal(item)}
-                  className="w-full text-left p-5 bg-[#1a293c] rounded-xl border border-slate-700 transition-all duration-300 hover:border-sky-500 hover:shadow-xl shadow-black/50"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-700/50 pb-2 mb-3">
-                    <span className={`text-xs font-bold py-1 px-3 rounded-full mb-2 sm:mb-0 uppercase tracking-wider
-                      ${item.category === 'อัปเดตระบบ' ? 'bg-sky-500/20 text-sky-300' : ''}
-                      ${item.category === 'ประกาศอบรม' ? 'bg-green-500/20 text-green-300' : ''}
-                      ${item.category === 'ซ่อมบำรุง' ? 'bg-yellow-500/20 text-yellow-300' : ''}
-                    `}>
-                      {item.category}
-                    </span>
-                    <p className="text-sm text-slate-400 font-medium">{item.date}</p>
-                  </div>
-                  <h3 className="text-xl font-bold text-white leading-snug">{item.title}</h3>
-                  <p className="text-slate-300 mt-2 text-sm leading-relaxed">{item.description}</p>
-                </button>
-              ))}
-              {/* *** (สิ้นสุดการแก้ไข) *** */}
-            </div>
+               <h2 className="text-4xl font-extrabold text-white tracking-tight">
+               ประกาศและข่าวสารสำคัญ
+               </h2>
+               <p className="text-lg text-slate-400 mt-4">
+               ติดตามข่าวสาร, การอัปเดตเวอร์ชัน, และประกาศสำคัญจากทีมพัฒนาระบบ
+               </p>
+             </div>
+ 
+             <div className="space-y-4">
+               {ANNOUNCEMENTS.map((item, index) => (
+                 <button
+                   key={index}
+                   onClick={() => openAnnouncementModal(item)}
+                   className="w-full text-left p-5 bg-[#1a293c] rounded-xl border border-slate-700 transition-all duration-300 hover:border-sky-500 hover:shadow-xl shadow-black/50"
+                 >
+                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-700/50 pb-2 mb-3">
+                     <span className={`text-xs font-bold py-1 px-3 rounded-full mb-2 sm:mb-0 uppercase tracking-wider
+                       ${item.category === 'อัปเดตระบบ' ? 'bg-sky-500/20 text-sky-300' : ''}
+                       ${item.category === 'ประกาศอบรม' ? 'bg-green-500/20 text-green-300' : ''}
+                       ${item.category === 'ซ่อมบำรุง' ? 'bg-yellow-500/20 text-yellow-300' : ''}
+                     `}>
+                       {item.category}
+                     </span>
+                     <p className="text-sm text-slate-400 font-medium">{item.date}</p>
+                   </div>
+                   <h3 className="text-xl font-bold text-white leading-snug">{item.title}</h3>
+                   <p className="text-slate-300 mt-2 text-sm leading-relaxed">{item.description}</p>
+                 </button>
+               ))}
+             </div>
           </div>
-          
-          {/* เส้นแสงด้านล่าง Announcements Section */}
           <div className="absolute bottom-0 left-0 right-0 h-[1px] overflow-hidden">
             <div className="animated-border-line"></div>
           </div>
         </section>
 
-        {/* Contact Section */}
+        {/* ... (โค้ด Contact Section) ... */}
         <section id="signup" className="py-20 bg-black/10 border-t border-white/5 relative">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="bg-[#1a293c] rounded-xl shadow-2xl shadow-black/70 overflow-hidden border border-slate-700">
-              <div className="grid lg:grid-cols-2 gap-0">
-                <div className="p-8 lg:p-12 flex flex-col justify-center bg-gradient-to-r from-[#131e32] to-[#1a293c]">
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 flex-shrink-0 flex items-center justify-center bg-sky-500/20 rounded-full">
-                        <svg className="w-8 h-8 text-sky-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                      </div>
-                      <div>
-                        <h2 className="text-3xl font-extrabold leading-tight text-white">ต้องการคำปรึกษา?</h2>
-                        <p className="text-slate-400 mt-1">ติดต่อทีมพัฒนาระบบ ERP รพร.ด่านซ้าย</p>
-                      </div>
-                    </div>
-                    <p className="text-slate-300 text-base leading-relaxed border-t border-slate-700/50 pt-6">
-                      เราพร้อมแบ่งปันองค์ความรู้และประสบการณ์ในการพัฒนาระบบเพื่อนำไปปรับใช้และต่อยอดสำหรับโรงพยาบาลอื่นๆ
-                    </p>
-                    <div className="space-y-3 pt-4">
-                      {['แลกเปลี่ยนประสบการณ์พัฒนาระบบ', 'ดูงานสาธิตการใช้งานระบบจริง', 'รับคำปรึกษาในการนำไปปรับใช้'].map((text, i) => (
-                        <div key={i} className="flex items-center gap-3">
-                          <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-sky-500/20 text-sky-300">
-                            <span className="text-sm font-bold">✓</span>
-                          </div>
-                          <span className="text-sm text-slate-300">{text}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Form Section */}
-                <div className="p-8 lg:p-12">
-                  <form className="space-y-6" onSubmit={handleSubmit}>
-                    <div>
-                      <label htmlFor="hospital-name" className="block text-sm font-semibold text-slate-300 mb-2">
-                        ชื่อโรงพยาบาล / หน่วยงาน
-                      </label>
-                      <input
-                        id="hospital-name"
-                        name="hospitalName"
-                        type="text"
-                        placeholder="กรอกชื่อหน่วยงานของคุณ"
-                        required
-                        className="w-full border border-slate-700 bg-[#203045] p-3 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
-                        value={formData.hospital}
-                        onChange={handleFormChange}
-                        disabled={isSubmitting}
-                      />
-                    </div>
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div>
-                        <label htmlFor="contact-email" className="block text-sm font-semibold text-slate-300 mb-2">
-                          อีเมลผู้ติดต่อ
-                        </label>
-                        <input
-                          id="contact-email"
-                          name="email"
-                          type="email"
-                          placeholder="your@email.com"
-                          required
-                          className="w-full border border-slate-700 bg-[#203045] p-3 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
-                          value={formData.email}
-                          onChange={handleFormChange}
-                          disabled={isSubmitting}
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="contact-tel" className="block text-sm font-semibold text-slate-300 mb-2">
-                          เบอร์โทรศัพท์
-                        </label>
-                        <input
-                          id="contact-tel"
-                          name="tel"
-                          type="tel"
-                          placeholder="0XX-XXX-XXXX"
-                          required
-                          className="w-full border border-slate-700 bg-[#203045] p-3 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
-                          value={formData.tel}
-                          onChange={handleFormChange}
-                          disabled={isSubmitting}
-                          maxLength={10}
-                          inputMode="numeric"
-                        />
-                      </div>
-                    </div>
-
-                    {submitStatus === 'success' && (
-                      <div className="p-3 rounded-lg text-center text-sm font-medium bg-green-500/10 border border-green-500/30 text-green-400">
-                        ส่งข้อมูลสำเร็จ! ทีมงานจะติดต่อกลับโดยเร็วที่สุด
-                      </div>
-                    )}
-                    {submitStatus === 'error' && (
-                      <div className="p-3 rounded-lg text-center text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-400">
-                        เกิดข้อผิดพลาด! กรุณาลองใหม่อีกครั้ง
-                      </div>
-                    )}
-
-                    <button
-                      type="submit"
-                      className="w-full bg-gradient-to-r from-sky-600 to-sky-700 text-white font-bold py-4 rounded-lg shadow-xl shadow-sky-500/30 hover:from-sky-700 hover:to-sky-800 transition-all transform hover:scale-[1.01]"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? 'กำลังส่งข้อมูล...' : 'ส่งเรื่องติดต่อทีมพัฒนา →'}
-                    </button>
-                    <p className="text-xs text-slate-500 text-center pt-4">
-                      🔒 ข้อมูลของคุณจะถูกเก็บเป็นความลับและใช้เพื่อการติดต่อกลับเท่านั้น
-                    </p>
-                  </form>
-                </div>
-              </div>
-            </div>
+               <div className="grid lg:grid-cols-2 gap-0">
+                 <div className="p-8 lg:p-12 flex flex-col justify-center bg-gradient-to-r from-[#131e32] to-[#1a293c]">
+                   <div className="space-y-6">
+                     <div className="flex items-center gap-4">
+                       <div className="w-14 h-14 flex-shrink-0 flex items-center justify-center bg-sky-500/20 rounded-full">
+                         <svg className="w-8 h-8 text-sky-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                       </div>
+                       <div>
+                         <h2 className="text-3xl font-extrabold leading-tight text-white">ต้องการคำปรึกษา?</h2>
+                         <p className="text-slate-400 mt-1">ติดต่อทีมพัฒนาระบบ ERP รพร.ด่านซ้าย</p>
+                       </div>
+                     </div>
+                     <p className="text-slate-300 text-base leading-relaxed border-t border-slate-700/50 pt-6">
+                       เราพร้อมแบ่งปันองค์ความรู้และประสบการณ์ในการพัฒนาระบบเพื่อนำไปปรับใช้และต่อยอดสำหรับโรงพยาบาลอื่นๆ
+                     </p>
+                     <div className="space-y-3 pt-4">
+                       {['แลกเปลี่ยนประสบการณ์พัฒนาระบบ', 'ดูงานสาธิตการใช้งานระบบจริง', 'รับคำปรึกษาในการนำไปปรับใช้'].map((text, i) => (
+                         <div key={i} className="flex items-center gap-3">
+                           <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-sky-500/20 text-sky-300">
+                             <span className="text-sm font-bold">✓</span>
+                           </div>
+                           <span className="text-sm text-slate-300">{text}</span>
+                         </div>
+                       ))}
+                     </div>
+                   </div>
+                 </div>
+                 <div className="p-8 lg:p-12">
+                   <form className="space-y-6" onSubmit={handleSubmit}>
+                     <div>
+                       <label htmlFor="hospital-name" className="block text-sm font-semibold text-slate-300 mb-2">
+                         ชื่อโรงพยาบาล / หน่วยงาน
+                       </label>
+                       <input
+                         id="hospital-name"
+                         name="hospitalName"
+                         type="text"
+                         placeholder="กรอกชื่อหน่วยงานของคุณ"
+                         required
+                         className="w-full border border-slate-700 bg-[#203045] p-3 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+                         value={formData.hospital}
+                         onChange={handleFormChange}
+                         disabled={isSubmitting}
+                       />
+                     </div>
+                     <div className="grid sm:grid-cols-2 gap-4">
+                       <div>
+                         <label htmlFor="contact-email" className="block text-sm font-semibold text-slate-300 mb-2">
+                           อีเมลผู้ติดต่อ
+                         </label>
+                         <input
+                           id="contact-email"
+                           name="email"
+                           type="email"
+                           placeholder="your@email.com"
+                           required
+                           className="w-full border border-slate-700 bg-[#203045] p-3 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+                           value={formData.email}
+                           onChange={handleFormChange}
+                           disabled={isSubmitting}
+                         />
+                       </div>
+                       <div>
+                         <label htmlFor="contact-tel" className="block text-sm font-semibold text-slate-300 mb-2">
+                           เบอร์โทรศัพท์
+                         </label>
+                         <input
+                           id="contact-tel"
+                           name="tel"
+                           type="tel"
+                           placeholder="0XX-XXX-XXXX"
+                           required
+                           className="w-full border border-slate-700 bg-[#203045] p-3 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+                           value={formData.tel}
+                           onChange={handleFormChange}
+                           disabled={isSubmitting}
+                           maxLength={10}
+                           inputMode="numeric"
+                         />
+                       </div>
+                     </div>
+                     {submitStatus === 'success' && (
+                       <div className="p-3 rounded-lg text-center text-sm font-medium bg-green-500/10 border border-green-500/30 text-green-400">
+                         ส่งข้อมูลสำเร็จ! ทีมงานจะติดต่อกลับโดยเร็วที่สุด
+                       </div>
+                     )}
+                     {submitStatus === 'error' && (
+                       <div className="p-3 rounded-lg text-center text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-400">
+                         เกิดข้อผิดพลาด! กรุณาลองใหม่อีกครั้ง
+                       </div>
+                     )}
+                     <button
+                       type="submit"
+                       className="w-full bg-gradient-to-r from-sky-600 to-sky-700 text-white font-bold py-4 rounded-lg shadow-xl shadow-sky-500/30 hover:from-sky-700 hover:to-sky-800 transition-all transform hover:scale-[1.01]"
+                       disabled={isSubmitting}
+                     >
+                       {isSubmitting ? 'กำลังส่งข้อมูล...' : 'ส่งเรื่องติดต่อทีมพัฒนา →'}
+                     </button>
+                     <p className="text-xs text-slate-500 text-center pt-4">
+                       🔒 ข้อมูลของคุณจะถูกเก็บเป็นความลับและใช้เพื่อการติดต่อกลับเท่านั้น
+                     </p>
+                   </form>
+                 </div>
+               </div>
+             </div>
           </div>
         </section>
       </main>
 
-      {/* *** 5. เพิ่ม Modal Component ที่นี่ *** */}
+      {/* *** 5. เพิ่ม Modal Components ที่นี่ *** */}
       <AnnouncementModal 
         item={selectedAnnouncement} 
         onClose={closeAnnouncementModal} 
       />
+      
+      <ArticleModal
+        item={selectedArticle}
+        onClose={closeArticleModal}
+      />
 
       <style jsx global>{`
-        /* โค้ดดาวลอย (Floating Stars) */
+        /* ... (โค้ด CSS เดิมทั้งหมด) ... */
         @keyframes floatStars {
           0% {
             transform: translateY(100vh) scale(0.3);
@@ -749,7 +792,6 @@ export default function Home() {
           animation: floatStars linear infinite;
         }
         
-        /* Module Scrolling Styles */
         @keyframes scrollRightToLeft {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
@@ -775,7 +817,6 @@ export default function Home() {
           animation-play-state: paused;
         }
 
-        /* เส้นแสงเคลื่อนไหว (Animated Border Lines) */
         @keyframes borderLightMove {
           0% {
             transform: translateX(-100%);
@@ -812,27 +853,19 @@ export default function Home() {
           animation: borderLightMove 3s ease-in-out infinite;
         }
 
-        /* Variant สำหรับเส้นแสงที่มีความเร็วต่างกัน */
         section:nth-child(2) .animated-border-line {
           animation-delay: 0s;
           animation-duration: 3s;
         }
-        
         section:nth-child(3) .animated-border-line {
           animation-delay: 0.5s;
           animation-duration: 3.5s;
         }
-        
-        section:nth-child(4) .animated-border-line {
-          animation-delay: 1s;
-          animation-duration: 4s;
-        }
-        
+        /* section:nth-child(4) (ที่เป็น bg-white) ไม่มีเส้นแสง */
         section:nth-child(5) .animated-border-line {
           animation-delay: 1.5s;
           animation-duration: 3.2s;
         }
-        
         section:nth-child(6) .animated-border-line {
           animation-delay: 2s;
           animation-duration: 3.8s;
