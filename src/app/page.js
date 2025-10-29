@@ -14,34 +14,30 @@ export function useIsVisible(threshold = 0) {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // isIntersecting เป็น true เมื่อองค์ประกอบอยู่ใน Viewport
-        if (entry.isIntersecting) {
-            setIsVisible(true);
-        } else if (entry.boundingClientRect.top < 0) {
-            // Fade out เมื่อเลื่อนผ่าน Hero ขึ้นไปด้านบน
-            setIsVisible(false);
-        }
-      },
-      { 
-        threshold: threshold,
-        rootMargin: '0px 0px -100px 0px' 
-      }
-    );
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // ...
+      },
+      { 
+        threshold: threshold,
+        rootMargin: '0px 0px -100px 0px' 
+      }
+    );
 
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
+    const currentRef = ref.current; // ⭐ เพิ่มบรรทัดนี้
 
-    return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
-      }
-    };
-  }, [threshold]);
+    if (currentRef) { // ⭐ ใช้ currentRef
+      observer.observe(currentRef);
+    }
 
-  return [ref, isVisible];
+    return () => {
+      if (currentRef) { // ⭐ ใช้ currentRef ใน Cleanup
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [threshold]);
+
+  return [ref, isVisible];
 }
 // =================================================================
 
