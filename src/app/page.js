@@ -178,23 +178,23 @@ const ArticleModal = ({ item, onClose }) => {
         <img src={item.imageUrl} alt={item.title} className="w-full h-48 md:h-60 object-cover" />
 
         <div className="p-6 md:p-8">
-          <p className="text-xs text-slate-400 mb-3">
-            <span className="font-semibold text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-full">{item.category}</span>
-            <span className="mx-2">|</span>
-            <span>{item.date}</span>
-          </p>
-          <h3 className="text-2xl font-bold text-white leading-snug mb-4">{item.title}</h3>
-          <p className="text-slate-300 text-base leading-relaxed">
-            นี่คือเนื้อหาฉบับเต็มสำหรับบทความ "{item.title}". 
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. 
-            Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus 
-            rhoncus ut eleifend nibh porttitor.
-          </p>
-           <p className="text-slate-300 text-base leading-relaxed mt-4">
-            (เนื้อหาสมมติ) ... Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis 
-            nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.
-          </p>
-        </div>
+          <p className="text-xs text-slate-400 mb-3">
+            <span className="font-semibold text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-full">{item.category}</span>
+            <span className="mx-2">|</span>
+            <span>{item.date}</span>
+          </p>
+          <h3 className="text-2xl font-bold text-white leading-snug mb-4">{item.title}</h3>
+          <p className="text-slate-300 text-base leading-relaxed">
+            นี่คือเนื้อหาฉบับเต็มสำหรับบทความ **'{item.title}'**. // 👈 แก้ไขบรรทัดนี้: เปลี่ยน " เป็น '
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. 
+            Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus 
+            rhoncus ut eleifend nibh porttitor.
+          </p>
+           <p className="text-slate-300 text-base leading-relaxed mt-4">
+            (เนื้อหาสมมติ) ... Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis 
+            nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.
+          </p>
+        </div>
       </div>
       
       <style jsx>{`
