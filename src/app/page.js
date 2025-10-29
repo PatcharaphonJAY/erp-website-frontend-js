@@ -181,7 +181,7 @@ const ArticleModal = ({ item, onClose }) => {
           </p>
           <h3 className="text-2xl font-bold text-white leading-snug mb-4">{item.title}</h3>
           <p className="text-slate-300 text-base leading-relaxed">
-            นี่คือเนื้อหาฉบับเต็มสำหรับบทความ **'{item.title}'**. // 👈 แก้ไขบรรทัดนี้: เปลี่ยน " เป็น '
+            นี่คือเนื้อหาฉบับเต็มสำหรับบทความ "{item.title}". // 👈 เปลี่ยนเครื่องหมายคำพูดตรงนี้
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. 
             Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus 
             rhoncus ut eleifend nibh porttitor.
