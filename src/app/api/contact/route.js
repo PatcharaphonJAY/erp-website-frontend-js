@@ -1,47 +1,57 @@
 import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
 
-// 1. สร้าง instance ของ Resend
-// ที่นี่ต้องเป็น "ชื่อ" ของตัวแปร ไม่ใช่ "ค่า" ของคีย์
-const resend = new Resend(process.env.RESEND_API_KEY); 
-//                          ^^^^^^^^^^^^^^^^^^^^^
-//                          (แก้เป็นแบบนี้)
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request) {
   try {
-    // 2. รับข้อมูลจาก form ที่ส่งมา
     const body = await request.json();
     const { hospital, email, tel } = body;
 
-    // 3. ตรวจสอบข้อมูล
     if (!hospital || !email || !tel) {
       return NextResponse.json({ error: 'กรุณากรอกข้อมูลให้ครบถ้วน' }, { status: 400 });
     }
+    
+    // ⬇️ --- (START) โค้ดทดสอบ (ใช้ onboarding@resend.dev) --- ⬇️
 
-    // 4. ส่งอีเมล
+    // ⭐ สร้างเนื้อหาอีเมล (html) ให้ดูเป็นระบบ
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; font-size: 16px; line-height: 1.6;">
+        <h2 style="color: #333;">[TEST] มีผู้ติดต่อใหม่</h2>
+        <p>รายละเอียดผู้ติดต่อ:</p>
+        <ul style="list-style-type: none; padding-left: 0;">
+          <li><strong>โรงพยาบาล/หน่วยงาน:</strong> ${hospital}</li>
+          <li><strong>อีเมลติดต่อกลับ:</strong> ${email}</li>
+          <li><strong>เบอร์โทร:</strong> ${tel}</li>
+        </ul>
+      </div>
+    `;
+
     const { data, error } = await resend.emails.send({
+      // 1. "from" ต้องเป็น onboarding@resend.dev
       from: 'onboarding@resend.dev', 
+      
+      // 2. "to" ต้องเป็นอีเมลที่คุณใช้สมัคร Resend เท่านั้น
       to: ['patcharaphon10509@gmail.com'], 
-      subject: `[ERP Contact] มีโรงพยาบาลติดต่อ: ${hospital}`,
-      html: `
-        <h2>มีผู้ติดต่อขอคำปรึกษา</h2>
-        <p><strong>ชื่อโรงพยาบาล/หน่วยงาน:</strong> ${hospital}</p>
-        <p><strong>อีเมลผู้ติดต่อ:</strong> ${email}</p>
-        <p><strong>เบอร์โทรศัพท์:</strong> ${tel}</p>
-      `,
-    });
+      
+      subject: `[TEST] มีคนติดต่อ: ${hospital}`,
 
-    // 5. จัดการ Error
+      // 3. ⭐ ใช้ตัวแปร emailHtml ที่เราสร้างไว้
+      html: emailHtml,
+      
+      // 4. (ห้ามใส่ reply_to เมื่อใช้ onboarding@resend.dev)
+    });
+    // ⬆️ --- (END) สิ้นสุดโค้ดทดสอบ --- ⬆️
+
     if (error) {
       console.error("Resend Error:", error);
-      return NextResponse.json({ error: 'ไม่สามารถส่งอีเมลได้' }, { status: 500 });
+      return NextResponse.json({ error: 'ไม่สามารถส่งอีเมลได้', details: error.message }, { status: 500 });
     }
 
-    // 6. ส่ง Response สำเร็จ
-    return NextResponse.json({ message: 'ส่งข้อมูลสำเร็จ!' });
+    return NextResponse.json({ message: 'ส่งข้อมูลสำเร็จ! (นี่คืออีเมลทดสอบ)' });
 
   } catch (err) {
-    console.error("API Error:", err);
+    console.error("API Error (Catch):", err);
     return NextResponse.json({ error: 'เกิดข้อผิดพลาดในระบบ' }, { status: 500 });
   }
 }
