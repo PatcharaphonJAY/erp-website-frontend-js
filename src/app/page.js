@@ -180,7 +180,7 @@ const ArticleModal = ({ item, onClose }) => {
             <span>{item.date}</span>
           </p>
           <p className="text-slate-300 text-base leading-relaxed">
-            นี่คือเนื้อหาฉบับเต็มสำหรับบทความ **'{item.title}'**. // ⭐ เปลี่ยน " เป็น '
+            นี่คือเนื้อหาฉบับเต็มสำหรับบทความ {item.title}. 
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. 
             Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus 
             rhoncus ut eleifend nibh porttitor.
