@@ -9,32 +9,38 @@ import { MIS_MODULES } from '../data/modules';
 // =================================================================
 // Custom Hook: สำหรับการตรวจจับการ Fade on Scroll
 // =================================================================
+
 export function useIsVisible(threshold = 0) {
-  const ref = useRef(null);
-  const [isVisible, setIsVisible] = useState(true);
+  const ref = useRef(null);
+  // 1. ค่าเริ่มต้นยังคงเป็น false (ถูกต้อง)
+  const [isVisible, setIsVisible] = useState(false); 
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // ...
-      },
-      { 
-        threshold: threshold,
-        rootMargin: '0px 0px -100px 0px' 
-      }
-    );
+  useEffect(() => {
+  	const observer = new IntersectionObserver(
+  	  ([entry]) => {
+  	    // ⭐ 2. แก้ไข:
+        // ตั้งค่า state ตามการมองเห็นจริง (true เมื่อเข้า, false เมื่อออก)
+  	    setIsVisible(entry.isIntersecting); 
+  	  },
+  	  { 
+  	    threshold: threshold,
+        // rootMargin ที่คุณตั้งไว้ (-100px) เหมาะสมดีแล้วครับ
+  	    rootMargin: '0px 0px -100px 0px' 
+  	  }
+  	);
 
-    const currentRef = ref.current; // ⭐ เพิ่มบรรทัดนี้
+  	const currentRef = ref.current;
 
-    if (currentRef) { // ⭐ ใช้ currentRef
-      observer.observe(currentRef);
-    }
+  	if (currentRef) {
+  	  observer.observe(currentRef);
+  	}
 
-    return () => {
-      if (currentRef) { // ⭐ ใช้ currentRef ใน Cleanup
-        observer.unobserve(currentRef);
-      }
-    };
+  	return () => {
+  	  if (currentRef) {
+        // 3. (unobserve จะทำงานเฉพาะตอน component ถูกทำลายเท่านั้น)
+  	    observer.unobserve(currentRef);
+  	  }
+  	};
   }, [threshold]);
 
   return [ref, isVisible];
@@ -212,15 +218,20 @@ export default function Home() {
   const [moduleView, setModuleView] = useState('grid');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [contactRef, isContactVisible] = useIsVisible(0.3);
   const [formData, setFormData] = useState({
     hospital: '',
     email: '',
     tel: '',
+    message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); 
 
   const [heroRef, isHeroVisible] = useIsVisible(0.1); 
+  const [announcementRef, isAnnouncementVisible] = useIsVisible(0.2);
+  const [personnelRef, isPersonnelVisible] = useIsVisible(0.2);
+  const [modulesRef, isModulesVisible] = useIsVisible(0.2); 
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [selectedArticle, setSelectedArticle] = useState(null);
 
@@ -289,16 +300,23 @@ export default function Home() {
     }
   ], []);
 
+  // ... ในฟังก์ชัน Home()
   const handleFormChange = (e) => {
-    const { id, value } = e.target;
-    const stateKey = id.replace('-name', '').replace('contact-', ''); 
-    let processedValue = value; 
-    if (id === 'contact-tel') {
-      const numericValue = value.replace(/[^0-9]/g, '');
-      processedValue = numericValue.slice(0, 10);
-    }
-    setFormData((prev) => ({ ...prev, [stateKey]: processedValue }));
+      const { id, value } = e.target;
+      const stateKey = id.replace('-name', '').replace('contact-', ''); 
+      let processedValue = value; 
+      if (id === 'contact-tel') {
+          const numericValue = value.replace(/[^0-9]/g, '');
+          processedValue = numericValue.slice(0, 10);
+      } else if (id === 'contact-message') { // ⭐ จัดการ state สำหรับกล่องข้อความ
+          processedValue = value;
+      }
+      setFormData((prev) => ({ 
+          ...prev, 
+          [stateKey.includes('hospital') ? 'hospital' : stateKey.includes('email') ? 'email' : stateKey.includes('tel') ? 'tel' : 'message']: processedValue 
+      }));
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault(); 
@@ -312,7 +330,7 @@ export default function Home() {
       });
       if (response.ok) {
         setSubmitStatus('success');
-        setFormData({ hospital: '', email: '', tel: '' });
+        setFormData({ hospital: '', email: '', tel: '', message: '' });
       } else {
         const errorData = await response.json();
         console.error('Submission error:', errorData.error);
@@ -457,12 +475,15 @@ export default function Home() {
         </section>
         
         {/* ... (โค้ด Modules Section) ... */}
-        <section id="modules" className="py-20 bg-black/20 backdrop-blur-sm border-t border-b border-white/5 relative">
+        <section id="modules" ref={modulesRef} className="py-20 bg-black/20 backdrop-blur-sm border-t border-b border-white/5 relative">
           <div className="container mx-auto px-4 max-w-7xl">
-            <div className="flex justify-between items-end mb-8 border-b border-slate-700/50 pb-4">
-               <h3 className="text-3xl font-bold text-white tracking-tight">
+            <div className={`flex justify-between items-end mb-8 border-b border-slate-700/50 pb-4
+              transition-all duration-700 ease-out
+              ${isModulesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
+            `}>
+               <h4 className="text-3xl font-bold text-white tracking-tight">
                  องค์ประกอบหลักของระบบ (Modules)
-               </h3>
+               </h4>
                <div className="flex items-center gap-4">
                  <div className="flex items-center gap-2 rounded-lg p-1 bg-white/10 border border-slate-700">
                    <button 
@@ -487,7 +508,9 @@ export default function Home() {
              </div>
 
              {moduleView === 'scroll' ? (
-               <div className="scroll-container">
+              <div className={`scroll-container transition-all duration-700 ease-out delay-200
+      	  		  ${isModulesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
+      	  		`}>
                  <div className="scroll-content scroll-right-to-left">
                    {[...MIS_MODULES, ...MIS_MODULES].map((m, i) => (
                      <div
@@ -524,9 +547,11 @@ export default function Home() {
         </section>
 
         {/* *** แก้ไข: Personnel & Blog Section (พื้นหลังสีขาว) *** */}
-        <section id="personnel-and-blog" className="py-20 bg-white relative">
+        <section id="personnel-and-blog"  ref={personnelRef} className="py-20 bg-white relative">
           <div className="container mx-auto px-4 max-w-7xl relative z-20">
-            <div className="text-center mb-16">
+            <div className={`text-center mb-16 transition-all duration-700 ease-out
+          	  ${isPersonnelVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
+          	`}>
               <h2 className="text-4xl font-extrabold text-slate-800 tracking-tight">
                 บุคลากรและองค์ความรู้
               </h2>
@@ -535,7 +560,9 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-x-12 gap-y-16">
+            <div className={`grid md:grid-cols-2 gap-x-12 gap-y-16 transition-all duration-700 ease-out delay-200
+          	  ${isPersonnelVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
+          	`}>
               {/* Team Section */}
               <div id="personnel">
                 <h3 className="text-xl font-bold border-b-2 border-sky-600 pb-3 mb-6 uppercase tracking-wider text-slate-800">
@@ -604,10 +631,13 @@ export default function Home() {
 
 
         {/* Announcement Section */}
-        <section id="announcements" className="py-20 bg-black/10 backdrop-blur-sm border-t border-white/5 relative">
+      <section id="announcements" 
+                ref={announcementRef} className="py-20 bg-black/10 backdrop-blur-sm border-t border-white/5 relative">
           <div className="container mx-auto px-4 max-w-4xl">
             {/* ... (โค้ดส่วน Announcement) ... */}
-            <div className="text-center mb-16">
+            <div className={`text-center mb-16 transition-all duration-700 ease-out
+          	  ${isAnnouncementVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
+          	`}>
                <h2 className="text-4xl font-extrabold text-white tracking-tight">
                ประกาศและข่าวสารสำคัญ
                </h2>
@@ -616,7 +646,9 @@ export default function Home() {
                </p>
              </div>
  
-             <div className="space-y-4">
+             <div className={`space-y-4 transition-all duration-700 ease-out delay-200
+          	  ${isAnnouncementVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
+          	  `}>
                {ANNOUNCEMENTS.map((item, index) => (
                  <button
                    key={index}
@@ -645,116 +677,151 @@ export default function Home() {
         </section>
 
         {/* ... (โค้ด Contact Section) ... */}
-        <section id="signup" className="py-20 bg-black/10 border-t border-white/5 relative">
+        <section id="signup" className="py-20 bg-black/10 border-t border-white/5 relative overflow-hidden"> {/* ⭐ เพิ่ม overflow-hidden เพื่อซ่อนตอนสไลด์ */}
           <div className="container mx-auto px-4 max-w-7xl">
-            <div className="bg-[#1a293c] rounded-xl shadow-2xl shadow-black/70 overflow-hidden border border-slate-700">
-               <div className="grid lg:grid-cols-2 gap-0">
-                 <div className="p-8 lg:p-12 flex flex-col justify-center bg-gradient-to-r from-[#131e32] to-[#1a293c]">
-                   <div className="space-y-6">
-                     <div className="flex items-center gap-4">
-                       <div className="w-14 h-14 flex-shrink-0 flex items-center justify-center bg-sky-500/20 rounded-full">
-                         <svg className="w-8 h-8 text-sky-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                       </div>
-                       <div>
-                         <h2 className="text-3xl font-extrabold leading-tight text-white">ต้องการคำปรึกษา?</h2>
-                         <p className="text-slate-400 mt-1">ติดต่อทีมพัฒนาระบบ ERP รพร.ด่านซ้าย</p>
-                       </div>
-                     </div>
-                     <p className="text-slate-300 text-base leading-relaxed border-t border-slate-700/50 pt-6">
-                       เราพร้อมแบ่งปันองค์ความรู้และประสบการณ์ในการพัฒนาระบบเพื่อนำไปปรับใช้และต่อยอดสำหรับโรงพยาบาลอื่นๆ
-                     </p>
-                     <div className="space-y-3 pt-4">
-                       {['แลกเปลี่ยนประสบการณ์พัฒนาระบบ', 'ดูงานสาธิตการใช้งานระบบจริง', 'รับคำปรึกษาในการนำไปปรับใช้'].map((text, i) => (
-                         <div key={i} className="flex items-center gap-3">
-                           <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-sky-500/20 text-sky-300">
-                             <span className="text-sm font-bold">✓</span>
-                           </div>
-                           <span className="text-sm text-slate-300">{text}</span>
-                         </div>
-                       ))}
-                     </div>
-                   </div>
-                 </div>
-                 <div className="p-8 lg:p-12">
-                   <form className="space-y-6" onSubmit={handleSubmit}>
-                     <div>
-                       <label htmlFor="hospital-name" className="block text-sm font-semibold text-slate-300 mb-2">
-                         ชื่อโรงพยาบาล / หน่วยงาน
-                       </label>
-                       <input
-                         id="hospital-name"
-                         name="hospitalName"
-                         type="text"
-                         placeholder="กรอกชื่อหน่วยงานของคุณ"
-                         required
-                         className="w-full border border-slate-700 bg-[#203045] p-3 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
-                         value={formData.hospital}
-                         onChange={handleFormChange}
-                         disabled={isSubmitting}
-                       />
-                     </div>
-                     <div className="grid sm:grid-cols-2 gap-4">
-                       <div>
-                         <label htmlFor="contact-email" className="block text-sm font-semibold text-slate-300 mb-2">
-                           อีเมลผู้ติดต่อ
-                         </label>
-                         <input
-                           id="contact-email"
-                           name="email"
-                           type="email"
-                           placeholder="your@email.com"
-                           required
-                           className="w-full border border-slate-700 bg-[#203045] p-3 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
-                           value={formData.email}
-                           onChange={handleFormChange}
-                           disabled={isSubmitting}
-                         />
-                       </div>
-                       <div>
-                         <label htmlFor="contact-tel" className="block text-sm font-semibold text-slate-300 mb-2">
-                           เบอร์โทรศัพท์
-                         </label>
-                         <input
-                           id="contact-tel"
-                           name="tel"
-                           type="tel"
-                           placeholder="0XX-XXX-XXXX"
-                           required
-                           className="w-full border border-slate-700 bg-[#203045] p-3 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
-                           value={formData.tel}
-                           onChange={handleFormChange}
-                           disabled={isSubmitting}
-                           maxLength={10}
-                           inputMode="numeric"
-                         />
-                       </div>
-                     </div>
-                     {submitStatus === 'success' && (
-                       <div className="p-3 rounded-lg text-center text-sm font-medium bg-green-500/10 border border-green-500/30 text-green-400">
-                         ส่งข้อมูลสำเร็จ! ทีมงานจะติดต่อกลับโดยเร็วที่สุด
-                       </div>
-                     )}
-                     {submitStatus === 'error' && (
-                       <div className="p-3 rounded-lg text-center text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-400">
-                         เกิดข้อผิดพลาด! กรุณาลองใหม่อีกครั้ง
-                       </div>
-                     )}
-                     <button
-                       type="submit"
-                       className="w-full bg-gradient-to-r from-sky-600 to-sky-700 text-white font-bold py-4 rounded-lg shadow-xl shadow-sky-500/30 hover:from-sky-700 hover:to-sky-800 transition-all transform hover:scale-[1.01]"
-                       disabled={isSubmitting}
-                     >
-                       {isSubmitting ? 'กำลังส่งข้อมูล...' : 'ส่งเรื่องติดต่อทีมพัฒนา →'}
-                     </button>
-                     <p className="text-xs text-slate-500 text-center pt-4">
-                       🔒 ข้อมูลของคุณจะถูกเก็บเป็นความลับและใช้เพื่อการติดต่อกลับเท่านั้น
-                     </p>
-                   </form>
-                 </div>
-               </div>
-             </div>
+              
+              {/* ⭐ 1. เพิ่ม ref={contactRef} ที่นี่ */}
+              <div 
+                  ref={contactRef}
+                  className="bg-[#1a293c] rounded-xl shadow-2xl shadow-black/70 overflow-hidden border border-slate-700"
+              >
+                  <div className="grid lg:grid-cols-2 gap-0">
+                      
+                      {/* ⭐ 2. ฝั่งซ้าย: เพิ่มคลาส Transition */}
+                      <div className={`p-8 lg:p-12 flex flex-col justify-start bg-gradient-to-r from-[#131e32] to-[#1a293c] 
+                          transition-all duration-700 ease-out 
+                          ${isContactVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-20'}
+                      `}>
+                          <div className="space-y-6">
+                              {/* (เนื้อหาฝั่งซ้าย: ต้องการคำปรึกษา?) */}
+                              <div className="flex items-center gap-4">
+                                  <div className="w-14 h-14 flex-shrink-0 flex items-center justify-center bg-sky-500/20 rounded-full">
+                                      <svg className="w-8 h-8 text-sky-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                                  </div>
+                                  <div>
+                                      <h2 className="text-3xl font-extrabold leading-tight text-white">ต้องการคำปรึกษา?</h2>
+                                      <p className="text-slate-400 mt-1">ติดต่อทีมพัฒนาระบบ ERP รพร.ด่านซ้าย</p>
+                                  </div>
+                              </div>
+                              <p className="text-slate-300 text-base leading-relaxed border-t border-slate-700/50 pt-6">
+                                  เราพร้อมแบ่งปันองค์ความรู้และประสบการณ์ในการพัฒนาระบบเพื่อนำไปปรับใช้และต่อยอดสำหรับโรงพยาบาลอื่นๆ
+                              </p>
+                              <div className="space-y-3 pt-4">
+                                  {['แลกเปลี่ยนประสบการณ์พัฒนาระบบ', 'ดูงานสาธิตการใช้งานระบบจริง', 'รับคำปรึกษาในการนำไปปรับใช้'].map((text, i) => (
+                                      <div key={i} className="flex items-center gap-3">
+                                          <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full bg-sky-500/20 text-sky-300">
+                                              <span className="text-sm font-bold">✓</span>
+                                          </div>
+                                          <span className="text-sm text-slate-300">{text}</span>
+                                      </div>
+                                  ))}
+                              </div>
+                          </div>
+                      </div>
+
+                      {/* ⭐ 3. ฝั่งขวา: เพิ่มคลาส Transition (และ delay) */}
+                      <div className={`p-8 lg:p-12 bg-white 
+                          transition-all duration-700 ease-out delay-200 
+                          ${isContactVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-20'}
+                      `}>
+                          <form className="space-y-6" onSubmit={handleSubmit}>
+                              {/* (เนื้อหาฟอร์มฝั่งขวา) */}
+                              <div>
+                                  <label htmlFor="hospital-name" className="block text-sm font-semibold text-slate-800 mb-2">
+                                      ชื่อโรงพยาบาล / หน่วยงาน
+                                  </label>
+                                  <input
+                                      id="hospital-name"
+                                      name="hospitalName"
+                                      type="text"
+                                      placeholder="กรอกชื่อหน่วยงานของคุณ"
+                                      required
+                                      className="w-full border border-slate-300 bg-slate-100 p-3 rounded-lg text-slate-900 placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+                                      value={formData.hospital}
+                                      onChange={handleFormChange}
+                                      disabled={isSubmitting}
+                                  />
+                              </div>
+                              <div className="grid sm:grid-cols-2 gap-4">
+                                  <div>
+                                      <label htmlFor="contact-email" className="block text-sm font-semibold text-slate-800 mb-2">
+                                          อีเมลผู้ติดต่อ
+                                      </label>
+                                      <input
+                                          id="contact-email"
+                                          name="email"
+                                          type="email"
+                                          placeholder="your@email.com"
+                                          required
+                                          className="w-full border border-slate-300 bg-slate-100 p-3 rounded-lg text-slate-900 placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+                                          value={formData.email}
+                                          onChange={handleFormChange}
+                                          disabled={isSubmitting}
+                                      />
+                                  </div>
+                                  <div>
+                                      <label htmlFor="contact-tel" className="block text-sm font-semibold text-slate-800 mb-2">
+                                          เบอร์โทรศัพท์
+                                      </label>
+                                      <input
+                                          id="contact-tel"
+                                          name="tel"
+                                          type="tel"
+                                          placeholder="0XX-XXX-XXXX"
+                                          required
+                                          className="w-full border border-slate-300 bg-slate-100 p-3 rounded-lg text-slate-900 placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+                                          value={formData.tel}
+                                          onChange={handleFormChange}
+                                          disabled={isSubmitting}
+                                          maxLength={10}
+                                          inputMode="numeric"
+                                      />
+                                  </div>
+                              </div>
+                              <div>
+                                  <label htmlFor="contact-message" className="block text-sm font-semibold text-slate-800 mb-2">
+                                      รายละเอียดที่ต้องการปรึกษา (ด้วยความจริงใจ)
+                                  </label>
+                                  <textarea
+                                      id="contact-message"
+                                      name="message"
+                                      rows="4"
+                                      placeholder="เช่น สนใจแลกเปลี่ยนประสบการณ์โมดูลคลังยา, ต้องการทราบข้อมูลด้านการเชื่อมต่อ HOSxP, หรือข้อสงสัยอื่นๆ..."
+                                      required
+                                      className="w-full border border-slate-300 bg-slate-100 p-3 rounded-lg text-slate-900 placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+                                      value={formData.message}
+                                      onChange={handleFormChange}
+                                      disabled={isSubmitting}
+                                  ></textarea>
+                              </div>
+
+                              {submitStatus === 'success' && (
+                                  <div className="p-3 rounded-lg text-center text-sm font-medium bg-green-500/10 border border-green-500/30 text-green-700">
+                                      ส่งข้อมูลสำเร็จ! ทีมงานจะติดต่อกลับโดยเร็วที่สุด
+                                  </div>
+                              )}
+                              {submitStatus === 'error' && (
+                                  <div className="p-3 rounded-lg text-center text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-700">
+                                      เกิดข้อผิดพลาด! กรุณาลองใหม่อีกครั้ง
+                                  </div>
+                              )}
+                              
+                              <button
+                                  type="submit"
+                                  className="w-full bg-sky-600 text-white font-bold py-4 rounded-lg shadow-xl shadow-sky-500/30 hover:bg-sky-700 transition-all transform hover:scale-[1.01]"
+                                  disabled={isSubmitting}
+                              >
+                                  {isSubmitting ? 'กำลังส่งข้อมูล...' : 'ส่งเรื่องติดต่อทีมพัฒนา →'}
+                              </button>
+                              <p className="text-xs text-slate-500 text-center pt-4">
+                                  🔒 ข้อมูลของคุณจะถูกเก็บเป็นความลับและใช้เพื่อการติดต่อกลับเท่านั้น
+                              </p>
+                          </form>
+                      </div>
+                  </div>
+              </div>
           </div>
-        </section>
+      </section>
       </main>
 
       {/* *** 5. เพิ่ม Modal Components ที่นี่ *** */}
