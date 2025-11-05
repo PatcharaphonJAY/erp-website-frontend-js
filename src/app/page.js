@@ -55,7 +55,7 @@ export function useIsVisible(threshold = 0) {
 // Component สำหรับแสดง Module Card
 const ModuleCard = ({ m }) => (
   <Link 
-    href={m.link || '#'} 
+    href={`/modules?module=${m.id}`}
     className="group p-6 rounded-xl shadow-xl transition-all duration-300 bg-[#1a293c] border border-slate-700 hover:border-sky-500 hover:-translate-y-1 block"
   >
     <div className="flex flex-col items-start gap-4">
@@ -513,8 +513,9 @@ export default function Home() {
       	  		`}>
                  <div className="scroll-content scroll-right-to-left">
                    {[...MIS_MODULES, ...MIS_MODULES].map((m, i) => (
-                     <div
+                     <Link
                        key={`scroll-${i}-${m.title}`}
+                       href={`/modules?module=${m.id}`}
                        className="scroll-item group p-4 rounded-xl shadow-lg transition-all duration-300 bg-[#1a293c] border border-slate-700 hover:border-sky-500 flex-shrink-0"
                        style={{ width: '220px' }}
                      >
@@ -529,7 +530,7 @@ export default function Home() {
                            <p className="text-[10px] text-slate-400 mt-0.5">{m.desc.split(' ').slice(0, 3).join(' ')}...</p>
                          </div>
                        </div>
-                     </div>
+                     </Link>
                    ))}
                  </div>
                </div>
