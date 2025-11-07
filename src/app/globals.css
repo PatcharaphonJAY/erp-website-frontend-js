@@ -24,3 +24,10 @@ body {
   color: var(--foreground);
   font-family: var(--font-kanit), sans-serif;  
 }
+html.grayscale-mode {
+  /* นี่คือหัวใจหลักครับ! */
+  filter: grayscale(100%);
+
+  /* เพิ่ม transition ให้นุ่มนวล */
+  transition: filter 0.3s ease-in-out;
+}
