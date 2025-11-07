@@ -30,7 +30,7 @@ const IconSearch = () => (
 
 
 // ----------------------------------------------
-// ▼▼▼ 2. Component สำหรับกลุ่มดาว (แก้ไขสี) ▼▼▼
+// 2. Component สำหรับกลุ่มดาว (แก้ไขสี)
 // ----------------------------------------------
 const RisingStars = () => {
   const [stars, setStars] = useState([]);
@@ -51,9 +51,7 @@ const RisingStars = () => {
       {stars.map(star => (
         <div
           key={star.id}
-          // ▼▼▼ REFACTOR: เปลี่ยนเป็นสีเหลือง
           className="absolute bg-yellow-400/70 rounded-full"
-          // ▲▲▲
           style={{
             left: `${star.left}%`,
             width: `${star.size}px`,
@@ -92,7 +90,14 @@ const RisingStars = () => {
 // ----------------------------------------------
 // 3. Main Admin Page Component (ปรับแก้ธีม)
 // ----------------------------------------------
+
+// ▼▼▼ 1. ลบ 'async' หน้าฟังก์ชันออก ▼▼▼
 export default function AdminDashboardPage() {
+
+  // ▼▼▼ 2. ลบโค้ด "หน่วงเวลา" 3 วินาที ออก ▼▼▼
+  // (บรรทัด await new Promise... ถูกลบออกไปแล้ว)
+  // ▲▲▲ สิ้นสุดการแก้ไข ▲▲▲
+
   const [activeView, setActiveView] = useState('personnel');
   const [personnel, setPersonnel] = useState(PHR_DAN_SAI_PERSONNEL_DATA);
   const [articles, setArticles] = useState(ERP_ARTICLES_DATA);
@@ -104,7 +109,6 @@ export default function AdminDashboardPage() {
 
   const SummaryStats = () => (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      {/* ▼▼▼ REFACTOR: ปรับ Card สถิติเป็นธีมสว่าง ▼▼▼ */}
       <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm border-b-4 border-sky-500">
         <h3 className="text-sm font-medium text-slate-500">บุคลากรทั้งหมด</h3>
         <p className="text-3xl font-bold text-slate-800">{personnel.length}</p>
@@ -117,12 +121,10 @@ export default function AdminDashboardPage() {
         <h3 className="text-sm font-medium text-slate-500">ประกาศทั้งหมด</h3>
         <p className="text-3xl font-bold text-slate-800">{announcements.length}</p>
       </div>
-      {/* ▲▲▲ REFACTOR ▲▲▲ */}
     </div>
   );
 
   const AdminMenu = () => (
-    // ▼▼▼ REFACTOR: ปรับ Menu เป็นธีมสว่าง ▼▼▼
     <div className="flex space-x-2 p-1 bg-white/50 border border-slate-200 rounded-lg mb-6 shadow-sm">
       {menuItems.map((item) => (
         <button
@@ -133,15 +135,14 @@ export default function AdminDashboardPage() {
           }}
           className={`px-4 py-2 rounded-md font-medium transition-all duration-200 ${
             activeView === item.key
-              ? 'bg-sky-600 text-white shadow-md' // <-- คงไว้ตามคำขอ
-              : 'text-slate-600 hover:bg-slate-200/50' // <-- ปรับสี
+              ? 'bg-sky-600 text-white shadow-md'
+              : 'text-slate-600 hover:bg-slate-200/50'
           }`}
         >
           {item.label}
         </button>
       ))}
     </div>
-    // ▲▲▲ REFACTOR ▲▲▲
   );
 
   // ... (ส่วน useMemo, sourceData, filteredData, handle... ไม่ได้เปลี่ยนแปลง Logic) ...
@@ -254,10 +255,8 @@ export default function AdminDashboardPage() {
 
 
   return (
-    // ▼▼▼ REFACTOR: เปลี่ยนพื้นหลังหลักเป็นสีเทาอ่อน และ text สีเข้ม ▼▼▼
     <div className="relative min-h-screen text-slate-700 p-8 overflow-hidden bg-slate-100">
       
-      {/* ▼▼▼ REFACTOR: ปรับสี Aurora ให้อ่อนลง และ Opacity สูงขึ้นสำหรับพื้นหลังสว่าง ▼▼▼ */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-[1200px] h-[300px] bg-gradient-to-br from-sky-300/30 via-blue-300/20 to-emerald-300/30 blur-[120px] opacity-80 rounded-full animate-aurora z-0"></div>
       
       <style jsx>{`
@@ -277,42 +276,35 @@ export default function AdminDashboardPage() {
         
         <div className="flex justify-between items-center mb-6">
           <div>
-            {/* ▼▼▼ REFACTOR: แก้ไข H1 เป็น 2 สี ▼▼▼ */}
             <h1 className="text-4xl font-extrabold text-slate-800 mb-2">
               ระบบจัดการหลังบ้าน <span className="text-sky-600">(Admin Dashboard)</span>
             </h1>
-            {/* ▼▼▼ REFACTOR: ปรับสี text ▼▼▼ */}
             <p className="text-lg text-slate-500">
               จัดการข้อมูล บุคลากร, บทความ และประกาศ
             </p>
           </div>
-          {/* ▼▼▼ REFACTOR: ปรับปุ่ม Logout เป็นธีมสว่าง ▼▼▼ */}
           <Link
             href="/"
             className="bg-white text-slate-700 hover:bg-slate-50 border border-slate-300 font-semibold py-2 px-5 rounded-lg shadow-sm transition-colors"
           >
             Logout
           </Link>
-          {/* ▲▲▲ REFACTOR ▲▲▲ */}
         </div>
         
         <SummaryStats />
         <AdminMenu />
 
-        {/* ▼▼▼ REFACTOR: เปลี่ยน Card หลักเป็นสีขาวทึบ ▼▼▼ */}
         <div className="bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden">
-          {/* ▼▼▼ REFACTOR: ปรับสี header ของ card ▼▼▼ */}
           <div className="flex flex-col md:flex-row justify-between items-center p-5 border-b border-slate-200 gap-4">
             <h2 className="text-2xl font-bold text-slate-800">
               {menuItems.find((item) => item.key === activeView)?.label}
             </h2>
             
-            {/* ▼▼▼ REFACTOR: ปรับสีช่องค้นหา ▼▼▼ */}
             <div className="relative w-full md:w-72">
               <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => setSearchTerm(e.g.target.value)}
                 placeholder="ค้นหา..."
                 className="w-full p-2 pl-10 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
               />
@@ -320,13 +312,11 @@ export default function AdminDashboardPage() {
                 <IconSearch />
               </div>
             </div>
-            {/* ▲▲▲ REFACTOR ▲▲▲ */}
           </div>
 
           <div className="p-5 flex justify-end">
             <button
               onClick={handleAdd}
-              // (คงสีปุ่มไว้ตามคำขอ)
               className="bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-sky-700 transition"
             >
               + เพิ่มข้อมูลใหม่
@@ -366,7 +356,6 @@ const DataTable = ({ columns, data, onEdit, onDelete }) => {
   if (data.length === 0) {
     tableRows = (
       <tr>
-        {/* ▼▼▼ REFACTOR: ปรับสี text ▼▼▼ */}
         <td colSpan={columns.length + 1} className="p-8 text-center text-slate-400">
           --- ไม่พบข้อมูล (หรือไม่มีข้อมูล) ---
         </td>
@@ -374,10 +363,8 @@ const DataTable = ({ columns, data, onEdit, onDelete }) => {
     );
   } else {
     tableRows = data.map((item) => (
-      // ▼▼▼ REFACTOR: ปรับสี hover ▼▼▼
       <tr key={item.id} className="hover:bg-slate-100/50 transition-colors">
         {columns.map((col) => (
-          // ▼▼▼ REFACTOR: ปรับสี text และ border รูปภาพ ▼▼▼
           <td key={`${item.id}-${col.key}`} className="p-4 text-slate-600 align-top">
             {col.key === 'imageUrl' && item[col.key] ? (
               <img src={item[col.key]} alt="Item" className="w-16 h-16 object-cover rounded-md border border-slate-300" />
@@ -387,7 +374,6 @@ const DataTable = ({ columns, data, onEdit, onDelete }) => {
           </td>
         ))}
         <td className="p-4 text-right space-x-2 align-top">
-          {/* (คงสีปุ่มไว้ตามคำขอ) */}
           <button
             onClick={() => onEdit(item)}
             className="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-medium text-yellow-500 bg-yellow-500/10 border border-yellow-500/30 rounded-md hover:bg-yellow-500/20"
@@ -411,7 +397,6 @@ const DataTable = ({ columns, data, onEdit, onDelete }) => {
     <div className="overflow-x-auto">
       <table className="w-full min-w-max text-left">
         <thead>
-          {/* ▼▼▼ REFACTOR: ปรับสี header ตาราง ▼▼▼ */}
           <tr className="border-b border-t border-slate-200 bg-slate-100/30">
             {columns.map((col) => (
               <th key={col.key} className="p-4 text-sm font-semibold text-slate-500 uppercase">
@@ -424,7 +409,6 @@ const DataTable = ({ columns, data, onEdit, onDelete }) => {
           </tr>
         </thead>
         
-        {/* ▼▼▼ REFACTOR: ปรับสีเส้นแบ่ง ▼▼▼ */}
         <tbody className="divide-y divide-slate-200/50">
           {tableRows}
         </tbody>
@@ -453,18 +437,15 @@ const CrudModal = ({ isOpen, onClose, onSave, mode, item, fields }) => {
   if (!isOpen) return null;
 
   return (
-    // ▼▼▼ REFACTOR: ปรับสี Overlay ▼▼▼
     <div
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
-      {/* ▼▼▼ REFACTOR: ปรับสี Modal เป็นสีขาว ▼▼▼ */}
       <div
         className="relative w-full max-w-2xl bg-white rounded-xl shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <form onSubmit={handleSubmit}>
-          {/* ▼▼▼ REFACTOR: ปรับสี Modal Header ▼▼▼ */}
           <div className="p-6 border-b border-slate-200">
             <h3 className="text-2xl font-bold text-slate-800">
               {mode === 'add' ? 'เพิ่มข้อมูลใหม่' : 'แก้ไขข้อมูล'}
@@ -473,7 +454,6 @@ const CrudModal = ({ isOpen, onClose, onSave, mode, item, fields }) => {
           <div className="p-6 space-y-4">
             {fields.map((field) =>
               field.type === 'textarea' ? (
-                // ▼▼▼ REFACTOR: ปรับสี Form Fields ▼▼▼
                 <div key={field.key}>
                   <label htmlFor={field.key} className="block text-sm font-medium text-slate-600 mb-1">
                     {field.label}
@@ -502,7 +482,6 @@ const CrudModal = ({ isOpen, onClose, onSave, mode, item, fields }) => {
               )
             )}
           </div>
-          {/* ▼▼▼ REFACTOR: ปรับสี Modal Footer ▼▼▼ */}
           <div className="p-6 border-t border-slate-200 flex justify-end space-x-3">
             <button
               type="button"
@@ -513,7 +492,6 @@ const CrudModal = ({ isOpen, onClose, onSave, mode, item, fields }) => {
             </button>
             <button
               type="submit"
-              // (คงสีปุ่มไว้ตามคำขอ)
               className="px-4 py-2 bg-sky-600 text-white font-bold rounded-lg hover:bg-sky-700 transition"
             >
               {mode === 'add' ? 'บันทึก' : 'อัปเดต'}
