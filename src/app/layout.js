@@ -5,15 +5,13 @@ import { usePathname } from 'next/navigation'; // ▼▼▼ 2. Import usePathnam
 import './globals.css';
 import Footer from '../components/Footer';
 
-// ▼▼▼ แก้ไข: ใส่ปีกกา { } กลับเข้าไปเหมือนเดิม ▼▼▼
+// ▼▼▼ 3. Import ทุกอย่างที่เราสร้างขึ้นมา ▼▼▼
 import { ThemeProvider } from './context/ThemeContext'; 
-// ▲▲▲ สิ้นสุดการแก้ไข ▲▲▲
-
 import MourningModeToggle from '../components/MourningModeToggle';
 import ThemeApplicator from '../components/ThemeApplicator';
+import BackToTopButton from '../components/BackToTopButton'; // <-- ปุ่มกลับไปด้านบน
+// ▲▲▲ สิ้นสุดการ Import ▲▲▲
 
-// หมายเหตุ: ผมลบ NextNProgressBar ออกก่อน เพราะจาก Log ดูเหมือนคุณจะลบมันออกไปแล้ว
-// (ถ้าคุณติดตั้งแล้วและจะใช้ต่อ ก็ import กลับเข้ามาได้เลยครับ)
 
 // ตั้งค่าฟอนต์ Kanit สำหรับภาษาไทย
 const kanit = Kanit({
@@ -38,18 +36,22 @@ export default function RootLayout({ children }) {
     <html lang="th" className={kanit.variable}>
       <body>
         <ThemeProvider>
+          {/* Component นี้จะคอยเพิ่ม/ลบ class 'grayscale-mode' */}
           <ThemeApplicator />
 
           <main className="min-h-screen">
             {children}
           </main>
 
-          {/* 1. Footer จะแสดงเฉพาะเมื่อ 'ไม่' ใช่หน้า Admin */}
+          {/* 1. Footer (ซ่อนในหน้า Admin) */}
           {!isAdminPage && <Footer />}
 
-          {/* 2. MourningModeToggle อยู่นอกเงื่อนไข (แสดงทุกหน้า) */}
+          {/* 2. ปุ่มโหมดไว้อาลัย (แสดงทุกหน้า - ขวาล่าง) */}
           <MourningModeToggle />
           
+          {/* 3. ปุ่มกลับไปด้านบน (แสดงทุกหน้า - ซ้ายล่าง) */}
+          <BackToTopButton />
+
         </ThemeProvider>
       </body>
     </html>
