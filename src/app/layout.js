@@ -4,9 +4,16 @@ import { Kanit } from 'next/font/google';
 import { usePathname } from 'next/navigation'; // ▼▼▼ 2. Import usePathname ▼▼▼
 import './globals.css';
 import Footer from '../components/Footer';
-import { ThemeProvider } from './context/ThemeContext'; // Path นี้อยู่ถูกที่แล้ว (app/context)
+
+// ▼▼▼ แก้ไข: ใส่ปีกกา { } กลับเข้าไปเหมือนเดิม ▼▼▼
+import { ThemeProvider } from './context/ThemeContext'; 
+// ▲▲▲ สิ้นสุดการแก้ไข ▲▲▲
+
 import MourningModeToggle from '../components/MourningModeToggle';
 import ThemeApplicator from '../components/ThemeApplicator';
+
+// หมายเหตุ: ผมลบ NextNProgressBar ออกก่อน เพราะจาก Log ดูเหมือนคุณจะลบมันออกไปแล้ว
+// (ถ้าคุณติดตั้งแล้วและจะใช้ต่อ ก็ import กลับเข้ามาได้เลยครับ)
 
 // ตั้งค่าฟอนต์ Kanit สำหรับภาษาไทย
 const kanit = Kanit({
@@ -16,18 +23,12 @@ const kanit = Kanit({
   variable: '--font-kanit',
 });
 
-// ▼▼▼ REFACTOR: ลบ metadata export ▼▼▼
-// เราต้องลบ metadata object นี้ออก
-// เพราะไฟล์นี้ถูกกำหนดเป็น 'use client' (ซึ่งจำเป็นสำหรับ usePathname)
-// และ Next.js ไม่อนุญาตให้ export metadata จาก Client Component
 /*
 export const metadata = {
   title: 'ERP รพร.ด่านซ้าย',
   description: 'ระบบ ERP พัฒนาโดยทีม รพร.ด่านซ้าย',
 };
 */
-// ▲▲▲ สิ้นสุดการแก้ไข ▲▲▲
-
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
@@ -36,7 +37,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="th" className={kanit.variable}>
       <body>
-        {/* เราต้องแก้ ThemeProvider ด้วย เพราะมันก็อยู่ใน app/ เหมือนกัน */}
         <ThemeProvider>
           <ThemeApplicator />
 
@@ -44,17 +44,12 @@ export default function RootLayout({ children }) {
             {children}
           </main>
 
-          {/* ▼▼▼ นี่คือส่วนที่แก้ไข ▼▼▼ */}
-
           {/* 1. Footer จะแสดงเฉพาะเมื่อ 'ไม่' ใช่หน้า Admin */}
           {!isAdminPage && <Footer />}
 
-          {/* 2. MourningModeToggle อยู่นอกเงื่อนไข 
-              จึงแสดงในทุกหน้า (รวมถึง Admin) */}
+          {/* 2. MourningModeToggle อยู่นอกเงื่อนไข (แสดงทุกหน้า) */}
           <MourningModeToggle />
           
-          {/* ▲▲▲ สิ้นสุดการแก้ไข ▲▲▲ */}
-
         </ThemeProvider>
       </body>
     </html>
