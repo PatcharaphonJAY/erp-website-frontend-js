@@ -92,7 +92,7 @@ const Navbar = ({ modules }) => {
             <Link href="/#blog" className="text-slate-100 hover:text-blue-400 font-medium transition-colors">บทความ</Link>
             <Link href="/#announcements" className="text-slate-100 hover:text-blue-400 font-medium transition-colors">ประกาศ</Link>
             <Link href="/#signup" className="text-slate-100 hover:text-blue-400 font-medium transition-colors">ติดต่อเรา</Link>
-      
+            <Link href="/login" className="text-slate-100 hover:text-blue-400 font-medium transition-colors">Sign In</Link>
           </div>
           
           <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden text-3xl text-slate-100">{isMenuOpen ? '✕' : '☰'}</button>
@@ -127,6 +127,7 @@ const Navbar = ({ modules }) => {
           <Link href="/#blog" className="text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md" onClick={closeMobileMenu}>บทความ</Link>
           <Link href="/#announcements" className="text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md" onClick={closeMobileMenu}>ประกาศ</Link>
           <Link href="/#signup" className="text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md" onClick={closeMobileMenu}>ติดต่อเรา</Link>
+          <Link href="/login" className="text-slate-200 hover:bg-blue-500/20 text-lg py-3 px-4 rounded-md" onClick={closeMobileMenu}>Sign In</Link>
         </div>
       </div>
     </header>
