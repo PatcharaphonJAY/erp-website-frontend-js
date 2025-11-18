@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  /* คุณจะต้อง import font Kanit ในไฟล์ layout.js 
+     เพื่อให้ --font-kanit ใช้งานได้ครับ */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-kanit), sans-serif; 
+}
+
+html.grayscale-mode {
+  /* นี่คือหัวใจหลักครับ! */
+  filter: grayscale(100%);
+
+  /* เพิ่ม transition ให้นุ่มนวล */
+  transition: filter 0.3s ease-in-out;
+}
